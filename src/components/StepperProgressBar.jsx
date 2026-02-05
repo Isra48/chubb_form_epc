@@ -6,7 +6,12 @@ function StepperProgressBar({ currentStep, totalSteps }) {
       <div className="progress-track">
         <div className="progress-fill" style={{ width: `${progress}%` }} />
       </div>
-      <p className="progress-label">Paso {currentStep} de {totalSteps}</p>
+      <div className="progress-meta">
+        <span>Progreso</span>
+        <span>
+          Paso {currentStep} de {totalSteps}
+        </span>
+      </div>
     </div>
   );
 }

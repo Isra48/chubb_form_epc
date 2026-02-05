@@ -8,22 +8,22 @@ function StepPaginationControls({
   onSubmit,
 }) {
   const isFirstStep = currentStep === 1;
-  const isSubmitStep = currentStep === 3;
+  const isSubmitStep = currentStep === totalSteps - 1;
 
   return (
     <div className="pagination-controls">
-      <button type="button" onClick={onPrev} disabled={isFirstStep || isLoading}>
+      <button type="button" className="btn btn-secondary" onClick={onPrev} disabled={isFirstStep || isLoading}>
         Anterior
       </button>
 
-      <span>Paso {currentStep} de {totalSteps}</span>
+      <span className="pagination-meta">Paso {currentStep} de {totalSteps}</span>
 
       {!isSubmitStep ? (
-        <button type="button" onClick={onNext} disabled={!canGoNext || isLoading}>
+        <button type="button" className="btn btn-primary" onClick={onNext} disabled={!canGoNext || isLoading}>
           Siguiente
         </button>
       ) : (
-        <button type="button" onClick={onSubmit} disabled={!canGoNext || isLoading}>
+        <button type="button" className="btn btn-primary" onClick={onSubmit} disabled={!canGoNext || isLoading}>
           {isLoading ? 'Enviando...' : 'Enviar'}
         </button>
       )}

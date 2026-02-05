@@ -1,6 +1,10 @@
-function InlineFieldError({ message }) {
+function InlineFieldError({ message, id }) {
   if (!message) return null;
-  return <p className="field-error">{message}</p>;
+  return (
+    <p id={id} className="field-error">
+      {message}
+    </p>
+  );
 }
 
 export default InlineFieldError;
