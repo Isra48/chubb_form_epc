@@ -33,6 +33,12 @@ body {
   min-height: 100dvh;
 }
 
+.split-layout,
+.form-shell,
+.graphic-content {
+  animation: fade-in 0.5s ease both;
+}
+
 .split-layout {
   min-height: 100dvh;
   display: grid;
@@ -64,6 +70,7 @@ body {
   background-size: cover;
   background-position: center;
   box-shadow: var(--shadow);
+  animation: float-in 0.6s ease both;
 }
 
 .graphic-copy {
@@ -102,6 +109,7 @@ body {
   grid-template-rows: auto auto 1fr auto;
   gap: 1.5rem;
   overflow: visible;
+  animation: rise-in 0.6s ease both;
 }
 
 .form-header {
@@ -165,6 +173,7 @@ body {
 .step-content {
   display: grid;
   gap: 1.25rem;
+  animation: fade-up 0.4s ease both;
 }
 
 .step-title {
@@ -217,6 +226,7 @@ body {
   object-position: center;
   border-radius: inherit;
   display: block;
+  animation: fade-in 0.35s ease both;
 }
 
 .photo-actions {
@@ -262,6 +272,7 @@ body {
   font-size: 1rem;
   font-family: inherit;
   color: var(--ink);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .field-input:focus,
@@ -354,7 +365,7 @@ body {
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
 
 .btn:disabled {
@@ -419,6 +430,57 @@ input[type='number']::-webkit-outer-spin-button {
 
 input[type='number'] {
   -moz-appearance: textfield;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @media (max-width: 900px) {
