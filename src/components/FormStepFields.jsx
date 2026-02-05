@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import InlineFieldError from './InlineFieldError';
 
 const genderOptions = [
@@ -11,18 +11,15 @@ const genderOptions = [
 
 function FormStepFields({ stepKey, values, errors, onFieldChange }) {
   const buildFieldId = (field) => `${stepKey}-${field}`;
-  const [photoPreview, setPhotoPreview] = useState('');
+  const photoPreview = useMemo(() => {
+    if (!(values.profilePhoto instanceof File)) return '';
+    return URL.createObjectURL(values.profilePhoto);
+  }, [values.profilePhoto]);
 
   useEffect(() => {
-    if (values.profilePhoto instanceof File) {
-      const objectUrl = URL.createObjectURL(values.profilePhoto);
-      setPhotoPreview(objectUrl);
-      return () => URL.revokeObjectURL(objectUrl);
-    }
-
-    setPhotoPreview('');
-    return undefined;
-  }, [values.profilePhoto]);
+    if (!photoPreview) return undefined;
+    return () => URL.revokeObjectURL(photoPreview);
+  }, [photoPreview]);
 
   const handleInputChange = (field) => (event) => {
     const value = event.target.value;
@@ -41,12 +38,12 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
           Foto de perfil
         </label>
         <div className="photo-uploader">
-          <div
-            className={`photo-preview ${photoPreview ? 'has-image' : ''}`}
-            style={photoPreview ? { backgroundImage: `url(${photoPreview})` } : undefined}
-            aria-hidden="true"
-          >
-            {!photoPreview ? <span>Sin foto</span> : null}
+          <div className="photo-preview" aria-live="polite">
+            {photoPreview ? (
+              <img src={photoPreview} alt="" />
+            ) : (
+              <span>Sin foto</span>
+            )}
           </div>
           <div className="photo-actions">
             <label className="btn btn-secondary photo-button" htmlFor={buildFieldId('profilePhoto')}>
