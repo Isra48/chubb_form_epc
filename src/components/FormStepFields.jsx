@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import InlineFieldError from './InlineFieldError';
 
 const genderOptions = [
@@ -10,14 +11,63 @@ const genderOptions = [
 
 function FormStepFields({ stepKey, values, errors, onFieldChange }) {
   const buildFieldId = (field) => `${stepKey}-${field}`;
+  const [photoPreview, setPhotoPreview] = useState('');
+
+  useEffect(() => {
+    if (values.profilePhoto instanceof File) {
+      const objectUrl = URL.createObjectURL(values.profilePhoto);
+      setPhotoPreview(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    }
+
+    setPhotoPreview('');
+    return undefined;
+  }, [values.profilePhoto]);
 
   const handleInputChange = (field) => (event) => {
     const value = event.target.value;
     onFieldChange(stepKey, field, value);
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0] || null;
+    onFieldChange(stepKey, 'profilePhoto', file);
+  };
+
   return (
     <div className="step-grid">
+      <div className={`field photo-field ${errors.profilePhoto ? 'has-error' : ''}`}>
+        <label className="field-label" htmlFor={buildFieldId('profilePhoto')}>
+          Foto de perfil
+        </label>
+        <div className="photo-uploader">
+          <div
+            className={`photo-preview ${photoPreview ? 'has-image' : ''}`}
+            style={photoPreview ? { backgroundImage: `url(${photoPreview})` } : undefined}
+            aria-hidden="true"
+          >
+            {!photoPreview ? <span>Sin foto</span> : null}
+          </div>
+          <div className="photo-actions">
+            <label className="btn btn-secondary photo-button" htmlFor={buildFieldId('profilePhoto')}>
+              Subir o tomar foto
+            </label>
+            <input
+              id={buildFieldId('profilePhoto')}
+              className="file-input"
+              type="file"
+              accept="image/*"
+              capture="user"
+              onChange={handleFileChange}
+            />
+            <p className="photo-helper">
+              {values.profilePhoto?.name ? values.profilePhoto.name : 'PNG o JPG. Max 5MB.'}
+            </p>
+          </div>
+        </div>
+        <InlineFieldError message={errors.profilePhoto} id={`${buildFieldId('profilePhoto')}-error`} />
+      </div>
+
       <div className={`field ${errors.firstName ? 'has-error' : ''}`}>
         <label className="field-label" htmlFor={buildFieldId('firstName')}>
           Nombres

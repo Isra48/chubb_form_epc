@@ -2,6 +2,7 @@ const NAME_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s'-]{2,60}$/;
 const PHONE_REGEX = /^\d{10}$/;
 
 export const fieldLabels = {
+  profilePhoto: 'Foto de perfil',
   firstName: 'Nombres',
   email: 'Email',
   paternalLastName: 'Apellido Paterno',

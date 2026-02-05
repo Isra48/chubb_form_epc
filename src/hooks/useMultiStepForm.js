@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { validateStepData } from '../utils/validators';
 
 const createEmptyStep = () => ({
+  profilePhoto: null,
   firstName: '',
   email: '',
   paternalLastName: '',

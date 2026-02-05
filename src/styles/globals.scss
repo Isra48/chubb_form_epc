@@ -26,7 +26,7 @@ body {
   min-height: 100dvh;
   background: var(--page-bg);
   color: var(--ink);
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 #root {
@@ -46,7 +46,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--panel-bg);
+  background: #00046c;
   overflow: hidden;
 }
 
@@ -68,41 +68,20 @@ body {
 
 .graphic-copy {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.9rem;
+  color: #ffffff;
 }
 
-.graphic-eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.7rem;
-  color: var(--muted);
+.graphic-title-image {
+  width: min(420px, 100%);
+  height: auto;
+}
+
+.graphic-statement {
   margin: 0;
-}
-
-.graphic-title {
-  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
-  font-weight: 600;
-  margin: 0;
-}
-
-.graphic-subtitle {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
-.graphic-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.graphic-tags span {
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.6);
-  font-size: 0.8rem;
-  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #ffffff;
 }
 
 .form-panel {
@@ -114,7 +93,7 @@ body {
 
 .form-shell {
   width: min(600px, 100%);
-  height: 100%;
+  min-height: 100%;
   background: var(--card-bg);
   border-radius: 30px;
   padding: clamp(1.5rem, 3vw, 2.75rem);
@@ -122,7 +101,7 @@ body {
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   gap: 1.5rem;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .form-header {
@@ -203,6 +182,61 @@ body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.1rem 1.6rem;
+}
+
+.photo-field {
+  grid-column: span 2;
+}
+
+.photo-uploader {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.photo-preview {
+  width: 84px;
+  height: 84px;
+  border-radius: 24px;
+  background: rgba(62, 122, 239, 0.08);
+  border: 1px dashed var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.photo-preview.has-image {
+  background-size: cover;
+  background-position: center;
+  border: none;
+}
+
+.photo-actions {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+}
+
+.photo-button {
+  border-color: rgba(62, 122, 239, 0.35);
+}
+
+.photo-helper {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.file-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
 }
 
 .field {
@@ -385,10 +419,6 @@ input[type='number'] {
 }
 
 @media (max-width: 900px) {
-  body {
-    overflow: hidden;
-  }
-
   .split-layout {
     grid-template-columns: 1fr;
     grid-template-rows: var(--graphic-mobile-height) 1fr;
@@ -411,16 +441,12 @@ input[type='number'] {
     min-height: 120px;
   }
 
-  .graphic-title {
-    font-size: 1.2rem;
+  .graphic-title-image {
+    width: min(320px, 100%);
   }
 
-  .graphic-subtitle {
-    font-size: 0.85rem;
-  }
-
-  .graphic-tags {
-    display: none;
+  .graphic-statement {
+    font-size: 0.9rem;
   }
 
   .form-panel {
@@ -440,6 +466,15 @@ input[type='number'] {
 
   .date-group {
     grid-column: span 1;
+  }
+
+  .photo-field {
+    grid-column: span 1;
+  }
+
+  .photo-uploader {
+    grid-template-columns: 1fr;
+    justify-items: start;
   }
 
   .pagination-controls {

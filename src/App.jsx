@@ -24,12 +24,17 @@ const STEP_COPY = {
   },
 };
 
+function sanitizeStep(stepData) {
+  const { profilePhoto, ...rest } = stepData;
+  return rest;
+}
+
 function buildPayload(formData) {
   return {
     submittedAt: new Date().toISOString(),
-    step1: { ...formData.step1 },
-    step2: { ...formData.step2 },
-    step3: { ...formData.step3 },
+    step1: sanitizeStep(formData.step1),
+    step2: sanitizeStep(formData.step2),
+    step3: sanitizeStep(formData.step3),
   };
 }
 
