@@ -8,7 +8,7 @@ function GraphicPanel() {
         <div className="graphic-visual-image" style={{ backgroundImage: `url(${collage})` }} />
       </div>
       <div className="graphic-copy">
-        <img className="graphic-title-image" src={titleImage} alt="Tu registro, claro y sin friccion." />
+        <img className="graphic-title-image" src={titleImage} alt="Tu registro, claro y sin fricción." />
         <p className="graphic-statement">Fortaleciendo al sector afianzador, acelerando resultados.</p>
       </div>
     </div>
