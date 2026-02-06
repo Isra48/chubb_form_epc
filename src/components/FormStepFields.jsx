@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useState } from 'react';
 import InlineFieldError from './InlineFieldError';
 
 const genderOptions = [
@@ -35,16 +35,9 @@ const yesNoOptions = [
 
 function FormStepFields({ stepKey, values, errors, onFieldChange }) {
   const buildFieldId = (field) => `${stepKey}-${field}`;
-
-  const photoPreview = useMemo(() => {
-    if (!(values.profilePhoto instanceof File)) return '';
-    return URL.createObjectURL(values.profilePhoto);
-  }, [values.profilePhoto]);
-
-  useEffect(() => {
-    if (!photoPreview) return undefined;
-    return () => URL.revokeObjectURL(photoPreview);
-  }, [photoPreview]);
+  const [photoError, setPhotoError] = useState('');
+  const photoPreview = values.profilePhotoBase64 || '';
+  const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024;
 
   const handleInputChange = (field) => (event) => {
     const value = event.target.value;
@@ -58,7 +51,37 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
 
   const handleFileChange = (event) => {
     const file = event.target.files?.[0] || null;
-    onFieldChange(stepKey, 'profilePhoto', file);
+
+    if (!file) {
+      setPhotoError('');
+      onFieldChange(stepKey, 'profilePhotoBase64', '');
+      onFieldChange(stepKey, 'profilePhotoName', '');
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_BYTES) {
+      setPhotoError('La imagen es muy pesada');
+      onFieldChange(stepKey, 'profilePhotoBase64', '');
+      onFieldChange(stepKey, 'profilePhotoName', '');
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const base64 = typeof reader.result === 'string' ? reader.result : '';
+      onFieldChange(stepKey, 'profilePhotoBase64', base64);
+      onFieldChange(stepKey, 'profilePhotoName', file.name);
+      setPhotoError('');
+    };
+
+    reader.onerror = () => {
+      setPhotoError('No se pudo leer la imagen.');
+      onFieldChange(stepKey, 'profilePhotoBase64', '');
+      onFieldChange(stepKey, 'profilePhotoName', '');
+    };
+
+    reader.readAsDataURL(file);
   };
 
   const handleYesNoChange = (field, detailField) => (event) => {
@@ -73,7 +96,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
   if (stepKey === 'step1') {
     return (
       <div className="step-grid">
-        <div className={`field photo-field ${errors.profilePhoto ? 'has-error' : ''}`}>
+        <div className={`field photo-field ${photoError ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('profilePhoto')}>
             Foto de perfil
           </label>
@@ -98,11 +121,11 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
                 onChange={handleFileChange}
               />
               <p className="photo-helper">
-                {values.profilePhoto?.name ? values.profilePhoto.name : 'PNG o JPG. Máx. 5 MB.'}
+                {values.profilePhotoName ? values.profilePhotoName : 'PNG o JPG. Máx. 1.5 MB.'}
               </p>
             </div>
           </div>
-          <InlineFieldError message={errors.profilePhoto} id={`${buildFieldId('profilePhoto')}-error`} />
+          <InlineFieldError message={photoError} id={`${buildFieldId('profilePhoto')}-error`} />
         </div>
 
         <div className={`field ${errors.firstName ? 'has-error' : ''}`}>

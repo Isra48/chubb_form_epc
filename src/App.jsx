@@ -5,9 +5,9 @@ import StepPaginationControls from './components/StepPaginationControls';
 import StepperProgressBar from './components/StepperProgressBar';
 import ThankYouStepView from './components/ThankYouStepView';
 import { useMultiStepForm } from './hooks/useMultiStepForm';
+import { useRegistration } from './hooks/useRegistration';
 import GraphicPanel from './layout/GraphicPanel';
 import SplitLayout from './layout/SplitLayout';
-import { submitForm } from './services/googleSheetsService';
 
 const STEP_COPY = {
   step1: {
@@ -28,18 +28,49 @@ const STEP_COPY = {
   },
 };
 
-function sanitizeStep(stepData) {
-  const { profilePhoto, ...rest } = stepData;
-  return rest;
+function formatYesNo(value) {
+  if (value === 'si') return 'Sí';
+  if (value === 'no') return 'No';
+  return '';
+}
+
+function formatDate({ day, month, year }) {
+  if (!day || !month || !year) return '';
+  const dayValue = String(day).padStart(2, '0');
+  const monthValue = String(month).padStart(2, '0');
+  return `${dayValue}/${monthValue}/${year}`;
 }
 
 function buildPayload(formData) {
   return {
-    submittedAt: new Date().toISOString(),
-    step1: sanitizeStep(formData.step1),
-    step2: sanitizeStep(formData.step2),
-    step3: sanitizeStep(formData.step3),
-    step4: sanitizeStep(formData.step4),
+    nombre: formData.step1.firstName?.trim(),
+    apellidoPaterno: formData.step1.paternalLastName?.trim(),
+    apellidoMaterno: formData.step1.maternalLastName?.trim(),
+    email: formData.step1.email?.trim(),
+    fechaNacimiento: formatDate({
+      day: formData.step1.birthDay,
+      month: formData.step1.birthMonth,
+      year: formData.step1.birthYear,
+    }),
+    genero: formData.step1.gender,
+    ciudadOrigen: formData.step1.flightCity?.trim(),
+    telefonoFijo: formData.step1.phoneLandline,
+    telefonoMovil: formData.step1.phoneMobile,
+    tallaPlayera: formData.step1.shirtSize,
+    claveAgente: formData.step2.agentKey?.trim(),
+    nombreDespacho: formData.step2.officeName?.trim(),
+    rfcDespacho: formData.step2.officeRfc?.trim(),
+    zona: formData.step2.zone,
+    tieneAlergia: formatYesNo(formData.step3.hasAllergies),
+    alergias: formData.step3.allergiesDetails?.trim(),
+    tienePadecimiento: formatYesNo(formData.step3.hasMedicalCondition),
+    padecimientos: formData.step3.medicalDetails?.trim(),
+    tieneRegimen: formatYesNo(formData.step3.hasDiet),
+    regimen: formData.step3.dietDetails?.trim(),
+    contactoEmergenciaNombre: formData.step4.emergencyContactName?.trim(),
+    contactoEmergenciaParentesco: formData.step4.emergencyRelationship?.trim(),
+    contactoEmergenciaTelefono: formData.step4.emergencyPhone,
+    imageBase64: formData.step1.profilePhotoBase64 || '',
   };
 }
 
@@ -63,12 +94,11 @@ function App() {
   const [attendanceState, setAttendanceState] = useState('pending');
   const [attendanceReady, setAttendanceReady] = useState(false);
   const [attendanceLoading, setAttendanceLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState('');
+  const { isSubmitting, errorMessage, successMessage, submitRegistration, clearMessages } = useRegistration();
 
   useEffect(() => {
-    setSubmitMessage('');
-  }, [currentStep]);
+    clearMessages();
+  }, [currentStep, clearMessages]);
 
   useEffect(() => {
     if (attendanceState !== 'yes') return undefined;
@@ -91,22 +121,12 @@ function App() {
       return;
     }
 
-    setIsSubmitting(true);
-    setSubmitMessage('');
-
     const payload = buildPayload(formData);
-    const result = await submitForm(payload);
-
-    setIsSubmitting(false);
+    const result = await submitRegistration(payload);
 
     if (result.ok) {
       showThankYou();
       return;
-    }
-
-    const isCorsLike = Boolean(result.error?.isCorsLike);
-    if (!isCorsLike) {
-      setSubmitMessage(result.error?.message || 'No fue posible enviar la información.');
     }
   };
 
@@ -126,9 +146,11 @@ function App() {
 
   const statusMessage = isSubmitting
     ? { type: 'loading', text: 'Enviando tu información...' }
-    : submitMessage
-      ? { type: 'error', text: submitMessage }
-      : null;
+    : errorMessage
+      ? { type: 'error', text: errorMessage }
+      : successMessage
+        ? { type: 'success', text: successMessage }
+        : null;
 
   const showFormSteps = attendanceReady;
   const showAttendanceGate = !attendanceReady && !isThankYouStep;

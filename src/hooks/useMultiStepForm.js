@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { validateStepData } from '../utils/validators';
 
 const createStep1 = () => ({
-  profilePhoto: null,
+  profilePhotoBase64: '',
+  profilePhotoName: '',
   firstName: '',
   paternalLastName: '',
   maternalLastName: '',

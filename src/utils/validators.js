@@ -2,7 +2,7 @@ const NAME_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s'-]{2,60}$/;
 const PHONE_REGEX = /^\d{10}$/;
 
 export const fieldLabels = {
-  profilePhoto: 'Foto de perfil',
+  profilePhotoBase64: 'Foto de perfil',
   firstName: 'Nombre(s)',
   paternalLastName: 'Apellido Paterno',
   maternalLastName: 'Apellido Materno',
@@ -77,10 +77,6 @@ export function validateStepData(stepKey, stepData) {
   const errors = {};
 
   if (stepKey === 'step1') {
-    if (!stepData.profilePhoto) {
-      errors.profilePhoto = 'La foto de perfil es obligatoria.';
-    }
-
     if (!stepData.firstName.trim()) {
       errors.firstName = 'Nombre(s) es obligatorio.';
     } else if (!isValidName(stepData.firstName)) {
