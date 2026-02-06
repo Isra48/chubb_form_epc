@@ -114,8 +114,8 @@ function App() {
       form={
         <div className="form-shell">
           <header className="form-header">
-            <p className="form-eyebrow">Registro EPC</p>
-            <h1 className="form-title">Formulario guiado</h1>
+            <p className="form-eyebrow">Registro CHUBB</p>
+            <h1 className="form-title">Por favor, completa el siguiente formulario.</h1>
             <p className="form-subtitle">Completa el registro en pocos pasos.</p>
           </header>
 
