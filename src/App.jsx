@@ -94,6 +94,7 @@ function App() {
   const [attendanceState, setAttendanceState] = useState('pending');
   const [attendanceReady, setAttendanceReady] = useState(false);
   const [attendanceLoading, setAttendanceLoading] = useState(false);
+  const [submissionCopyIndex, setSubmissionCopyIndex] = useState(0);
   const { isSubmitting, errorMessage, successMessage, submitRegistration, clearMessages } = useRegistration();
 
   useEffect(() => {
@@ -113,6 +114,19 @@ function App() {
 
     return () => clearTimeout(timer);
   }, [attendanceState]);
+
+  useEffect(() => {
+    if (!isSubmitting) {
+      setSubmissionCopyIndex(0);
+      return undefined;
+    }
+
+    const interval = setInterval(() => {
+      setSubmissionCopyIndex((prev) => (prev + 1) % 4);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isSubmitting]);
 
   const handleSubmit = async () => {
     const errors = validateCurrentStep();
@@ -154,6 +168,13 @@ function App() {
 
   const showFormSteps = attendanceReady;
   const showAttendanceGate = !attendanceReady && !isThankYouStep;
+
+  const submissionCopy = [
+    'Validando información',
+    'Subiendo foto al sistema',
+    'Revisando datos empresariales',
+    'Esto puede tardar 2 min.',
+  ];
 
   const handleAttendanceYes = () => {
     if (attendanceLoading) return;
@@ -241,6 +262,17 @@ function App() {
 
             {showFormSteps && !isThankYouStep && statusMessage ? (
               <FormStatusMessage type={statusMessage.type} message={statusMessage.text} />
+            ) : null}
+
+            {showFormSteps && !isThankYouStep && isSubmitting ? (
+              <div className="submission-loader" aria-live="polite">
+                <div className="loader-dots" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <p>{submissionCopy[submissionCopyIndex]}</p>
+              </div>
             ) : null}
           </div>
 

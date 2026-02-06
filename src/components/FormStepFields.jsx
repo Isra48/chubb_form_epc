@@ -117,7 +117,6 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
                 className="file-input"
                 type="file"
                 accept="image/*"
-                capture="user"
                 onChange={handleFileChange}
               />
               <p className="photo-helper">

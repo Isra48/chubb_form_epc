@@ -315,6 +315,18 @@ body {
   color: var(--muted);
 }
 
+.submission-loader {
+  display: grid;
+  gap: 0.4rem;
+  justify-items: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.submission-loader p {
+  margin: 0;
+}
+
 .loader-dots {
   display: inline-flex;
   gap: 0.35rem;
