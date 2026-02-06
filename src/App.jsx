@@ -183,6 +183,7 @@ function App() {
                   <>
                     <div className="attendance-copy">
                       <h1 className="attendance-title">Registro Chubb Surety Connect</h1>
+                      <p className="attendance-location">📍 Los Cabos, México</p>
                       <p className="attendance-lead">
                         Para continuar con el registro para nuestro Chubb Surety Connect 2026, te pedimos nos apoyes
                         confirmando tu asistencia
@@ -190,7 +191,7 @@ function App() {
                     </div>
                     <div className="attendance-actions">
                       <button type="button" className="btn btn-primary" onClick={handleAttendanceYes}>
-                        Sí, nos vemos en Los Cabos
+                        Sí, nos vemos en Los Cabos 🌵☀️🏝️
                       </button>
                       <button type="button" className="btn btn-secondary" onClick={handleAttendanceNo}>
                         No
