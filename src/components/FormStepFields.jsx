@@ -628,7 +628,7 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
       <div className="step-grid">
         <div className={`field full-width ${isTouched('hasAllergies') && errors.hasAllergies ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('hasAllergies')}>
-            ¿Tienes alguna alergia?
+          ¿Tienes alguna alergia que debamos tener en cuenta?
           </label>
           <div className="select-wrapper">
             <select
@@ -726,7 +726,7 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
 
         <div className={`field full-width ${isTouched('hasDiet') && errors.hasDiet ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('hasDiet')}>
-            ¿Tienes algún régimen alimenticio?
+          ¿Tienes alguna restricción alimenticia que debamos tener en cuenta?
           </label>
           <div className="select-wrapper">
             <select
