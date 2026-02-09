@@ -33,15 +33,20 @@ const yesNoOptions = [
   { value: 'no', label: 'No' },
 ];
 
-function FormStepFields({ stepKey, values, errors, onFieldChange }) {
+function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, onFieldBlur }) {
   const buildFieldId = (field) => `${stepKey}-${field}`;
   const [photoError, setPhotoError] = useState('');
   const photoPreview = values.profilePhotoBase64 || '';
   const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024;
+  const isTouched = (field) => Boolean(touched?.[field]);
 
   const handleInputChange = (field) => (event) => {
     const value = event.target.value;
     onFieldChange(stepKey, field, value);
+  };
+
+  const handleBlur = (field) => () => {
+    if (onFieldBlur) onFieldBlur(stepKey, field);
   };
 
   const handleNumericChange = (field, maxLength = 10) => (event) => {
@@ -56,6 +61,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
       setPhotoError('');
       onFieldChange(stepKey, 'profilePhotoBase64', '');
       onFieldChange(stepKey, 'profilePhotoName', '');
+      if (onFieldBlur) onFieldBlur(stepKey, 'profilePhotoBase64');
       return;
     }
 
@@ -63,6 +69,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
       setPhotoError('La imagen es muy pesada');
       onFieldChange(stepKey, 'profilePhotoBase64', '');
       onFieldChange(stepKey, 'profilePhotoName', '');
+      if (onFieldBlur) onFieldBlur(stepKey, 'profilePhotoBase64');
       return;
     }
 
@@ -73,12 +80,14 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
       onFieldChange(stepKey, 'profilePhotoBase64', base64);
       onFieldChange(stepKey, 'profilePhotoName', file.name);
       setPhotoError('');
+      if (onFieldBlur) onFieldBlur(stepKey, 'profilePhotoBase64');
     };
 
     reader.onerror = () => {
       setPhotoError('No se pudo leer la imagen.');
       onFieldChange(stepKey, 'profilePhotoBase64', '');
       onFieldChange(stepKey, 'profilePhotoName', '');
+      if (onFieldBlur) onFieldBlur(stepKey, 'profilePhotoBase64');
     };
 
     reader.readAsDataURL(file);
@@ -127,7 +136,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
           <InlineFieldError message={photoError} id={`${buildFieldId('profilePhoto')}-error`} />
         </div>
 
-        <div className={`field ${errors.firstName ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('firstName') && errors.firstName ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('firstName')}>
             Nombre(s)
           </label>
@@ -137,13 +146,17 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             type="text"
             value={values.firstName}
             onChange={handleInputChange('firstName')}
+            onBlur={handleBlur('firstName')}
             aria-invalid={Boolean(errors.firstName)}
             aria-describedby={errors.firstName ? `${buildFieldId('firstName')}-error` : undefined}
           />
-          <InlineFieldError message={errors.firstName} id={`${buildFieldId('firstName')}-error`} />
+          <InlineFieldError
+            message={isTouched('firstName') ? errors.firstName : ''}
+            id={`${buildFieldId('firstName')}-error`}
+          />
         </div>
 
-        <div className={`field ${errors.paternalLastName ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('paternalLastName') && errors.paternalLastName ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('paternalLastName')}>
             Apellido Paterno
           </label>
@@ -153,16 +166,17 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             type="text"
             value={values.paternalLastName}
             onChange={handleInputChange('paternalLastName')}
+            onBlur={handleBlur('paternalLastName')}
             aria-invalid={Boolean(errors.paternalLastName)}
             aria-describedby={errors.paternalLastName ? `${buildFieldId('paternalLastName')}-error` : undefined}
           />
           <InlineFieldError
-            message={errors.paternalLastName}
+            message={isTouched('paternalLastName') ? errors.paternalLastName : ''}
             id={`${buildFieldId('paternalLastName')}-error`}
           />
         </div>
 
-        <div className={`field ${errors.maternalLastName ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('maternalLastName') && errors.maternalLastName ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('maternalLastName')}>
             Apellido Materno
           </label>
@@ -172,16 +186,17 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             type="text"
             value={values.maternalLastName}
             onChange={handleInputChange('maternalLastName')}
+            onBlur={handleBlur('maternalLastName')}
             aria-invalid={Boolean(errors.maternalLastName)}
             aria-describedby={errors.maternalLastName ? `${buildFieldId('maternalLastName')}-error` : undefined}
           />
           <InlineFieldError
-            message={errors.maternalLastName}
+            message={isTouched('maternalLastName') ? errors.maternalLastName : ''}
             id={`${buildFieldId('maternalLastName')}-error`}
           />
         </div>
 
-        <div className={`field ${errors.email ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('email') && errors.email ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('email')}>
             Correo electrónico
           </label>
@@ -191,13 +206,21 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             type="email"
             value={values.email}
             onChange={handleInputChange('email')}
+            onBlur={handleBlur('email')}
             aria-invalid={Boolean(errors.email)}
             aria-describedby={errors.email ? `${buildFieldId('email')}-error` : undefined}
           />
-          <InlineFieldError message={errors.email} id={`${buildFieldId('email')}-error`} />
+          <InlineFieldError message={isTouched('email') ? errors.email : ''} id={`${buildFieldId('email')}-error`} />
         </div>
 
-        <div className={`field date-group ${errors.birthDay || errors.birthMonth || errors.birthYear ? 'has-error' : ''}`}>
+        <div
+          className={`field date-group ${
+            (isTouched('birthDay') || isTouched('birthMonth') || isTouched('birthYear')) &&
+            (errors.birthDay || errors.birthMonth || errors.birthYear)
+              ? 'has-error'
+              : ''
+          }`}
+        >
           <label className="field-label" htmlFor={buildFieldId('birthDay')}>
             Fecha de nacimiento
           </label>
@@ -210,6 +233,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               placeholder="Día"
               value={values.birthDay}
               onChange={handleNumericChange('birthDay', 2)}
+              onBlur={handleBlur('birthDay')}
               maxLength={2}
               aria-invalid={Boolean(errors.birthDay)}
             />
@@ -221,6 +245,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               placeholder="Mes"
               value={values.birthMonth}
               onChange={handleNumericChange('birthMonth', 2)}
+              onBlur={handleBlur('birthMonth')}
               maxLength={2}
               aria-invalid={Boolean(errors.birthMonth)}
             />
@@ -232,17 +257,23 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               placeholder="Año"
               value={values.birthYear}
               onChange={handleNumericChange('birthYear', 4)}
+              onBlur={handleBlur('birthYear')}
               maxLength={4}
               aria-invalid={Boolean(errors.birthYear)}
             />
           </div>
+          <p className="field-helper field-helper-compact">Formato: DD / MM / AAAA</p>
           <InlineFieldError
-            message={errors.birthDay || errors.birthMonth || errors.birthYear}
+            message={
+              isTouched('birthDay') || isTouched('birthMonth') || isTouched('birthYear')
+                ? errors.birthDay || errors.birthMonth || errors.birthYear
+                : ''
+            }
             id={`${buildFieldId('birthDay')}-error`}
           />
         </div>
 
-        <div className={`field ${errors.gender ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('gender') && errors.gender ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('gender')}>
             Género
           </label>
@@ -252,6 +283,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               className="field-input"
               value={values.gender}
               onChange={handleInputChange('gender')}
+              onBlur={handleBlur('gender')}
               aria-invalid={Boolean(errors.gender)}
             >
               {genderOptions.map((option) => (
@@ -262,10 +294,10 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             </select>
             <span className="select-arrow" aria-hidden="true" />
           </div>
-          <InlineFieldError message={errors.gender} id={`${buildFieldId('gender')}-error`} />
+          <InlineFieldError message={isTouched('gender') ? errors.gender : ''} id={`${buildFieldId('gender')}-error`} />
         </div>
 
-        <div className={`field ${errors.flightCity ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('flightCity') && errors.flightCity ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('flightCity')}>
             Ciudad de origen del vuelo
           </label>
@@ -275,32 +307,17 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             type="text"
             value={values.flightCity}
             onChange={handleInputChange('flightCity')}
+            onBlur={handleBlur('flightCity')}
             aria-invalid={Boolean(errors.flightCity)}
             aria-describedby={errors.flightCity ? `${buildFieldId('flightCity')}-error` : undefined}
           />
-          <InlineFieldError message={errors.flightCity} id={`${buildFieldId('flightCity')}-error`} />
-        </div>
-
-        <div className={`field ${errors.phoneLandline ? 'has-error' : ''}`}>
-          <label className="field-label" htmlFor={buildFieldId('phoneLandline')}>
-            Teléfono fijo
-          </label>
-          <input
-            id={buildFieldId('phoneLandline')}
-            className="field-input"
-            type="text"
-            inputMode="numeric"
-            pattern="\d*"
-            value={values.phoneLandline}
-            onChange={handleNumericChange('phoneLandline', 10)}
-            maxLength={10}
-            aria-invalid={Boolean(errors.phoneLandline)}
-            aria-describedby={errors.phoneLandline ? `${buildFieldId('phoneLandline')}-error` : undefined}
+          <InlineFieldError
+            message={isTouched('flightCity') ? errors.flightCity : ''}
+            id={`${buildFieldId('flightCity')}-error`}
           />
-          <InlineFieldError message={errors.phoneLandline} id={`${buildFieldId('phoneLandline')}-error`} />
         </div>
 
-        <div className={`field ${errors.phoneMobile ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('phoneMobile') && errors.phoneMobile ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('phoneMobile')}>
             Teléfono móvil
           </label>
@@ -312,14 +329,41 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             pattern="\d*"
             value={values.phoneMobile}
             onChange={handleNumericChange('phoneMobile', 10)}
+            onBlur={handleBlur('phoneMobile')}
             maxLength={10}
             aria-invalid={Boolean(errors.phoneMobile)}
             aria-describedby={errors.phoneMobile ? `${buildFieldId('phoneMobile')}-error` : undefined}
           />
-          <InlineFieldError message={errors.phoneMobile} id={`${buildFieldId('phoneMobile')}-error`} />
+          <InlineFieldError
+            message={isTouched('phoneMobile') ? errors.phoneMobile : ''}
+            id={`${buildFieldId('phoneMobile')}-error`}
+          />
         </div>
 
-        <div className={`field ${errors.shirtSize ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('phoneLandline') && errors.phoneLandline ? 'has-error' : ''}`}>
+          <label className="field-label" htmlFor={buildFieldId('phoneLandline')}>
+            Teléfono fijo
+          </label>
+          <input
+            id={buildFieldId('phoneLandline')}
+            className="field-input"
+            type="text"
+            inputMode="numeric"
+            pattern="\d*"
+            value={values.phoneLandline}
+            onChange={handleNumericChange('phoneLandline', 10)}
+            onBlur={handleBlur('phoneLandline')}
+            maxLength={10}
+            aria-invalid={Boolean(errors.phoneLandline)}
+            aria-describedby={errors.phoneLandline ? `${buildFieldId('phoneLandline')}-error` : undefined}
+          />
+          <InlineFieldError
+            message={isTouched('phoneLandline') ? errors.phoneLandline : ''}
+            id={`${buildFieldId('phoneLandline')}-error`}
+          />
+        </div>
+
+        <div className={`field ${isTouched('shirtSize') && errors.shirtSize ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('shirtSize')}>
             Talla de playera
           </label>
@@ -329,6 +373,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               className="field-input"
               value={values.shirtSize}
               onChange={handleInputChange('shirtSize')}
+              onBlur={handleBlur('shirtSize')}
               aria-invalid={Boolean(errors.shirtSize)}
             >
               {shirtSizeOptions.map((option) => (
@@ -339,7 +384,10 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             </select>
             <span className="select-arrow" aria-hidden="true" />
           </div>
-          <InlineFieldError message={errors.shirtSize} id={`${buildFieldId('shirtSize')}-error`} />
+          <InlineFieldError
+            message={isTouched('shirtSize') ? errors.shirtSize : ''}
+            id={`${buildFieldId('shirtSize')}-error`}
+          />
         </div>
       </div>
     );
@@ -348,7 +396,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
   if (stepKey === 'step2') {
     return (
       <div className="step-grid">
-        <div className={`field full-width ${errors.agentKey ? 'has-error' : ''}`}>
+        <div className={`field full-width ${isTouched('agentKey') && errors.agentKey ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('agentKey')}>
             Clave de Agente/Broker
           </label>
@@ -358,13 +406,14 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             type="text"
             value={values.agentKey}
             onChange={handleInputChange('agentKey')}
+            onBlur={handleBlur('agentKey')}
             aria-invalid={Boolean(errors.agentKey)}
             aria-describedby={errors.agentKey ? `${buildFieldId('agentKey')}-error` : undefined}
           />
-          <InlineFieldError message={errors.agentKey} id={`${buildFieldId('agentKey')}-error`} />
+          <InlineFieldError message={isTouched('agentKey') ? errors.agentKey : ''} id={`${buildFieldId('agentKey')}-error`} />
         </div>
 
-        <div className={`field full-width ${errors.officeName ? 'has-error' : ''}`}>
+        <div className={`field full-width ${isTouched('officeName') && errors.officeName ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('officeName')}>
             Nombre del despacho
           </label>
@@ -374,13 +423,17 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             type="text"
             value={values.officeName}
             onChange={handleInputChange('officeName')}
+            onBlur={handleBlur('officeName')}
             aria-invalid={Boolean(errors.officeName)}
             aria-describedby={errors.officeName ? `${buildFieldId('officeName')}-error` : undefined}
           />
-          <InlineFieldError message={errors.officeName} id={`${buildFieldId('officeName')}-error`} />
+          <InlineFieldError
+            message={isTouched('officeName') ? errors.officeName : ''}
+            id={`${buildFieldId('officeName')}-error`}
+          />
         </div>
 
-        <div className={`field ${errors.officeRfc ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('officeRfc') && errors.officeRfc ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('officeRfc')}>
             RFC del despacho
           </label>
@@ -390,13 +443,17 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             type="text"
             value={values.officeRfc}
             onChange={handleInputChange('officeRfc')}
+            onBlur={handleBlur('officeRfc')}
             aria-invalid={Boolean(errors.officeRfc)}
             aria-describedby={errors.officeRfc ? `${buildFieldId('officeRfc')}-error` : undefined}
           />
-          <InlineFieldError message={errors.officeRfc} id={`${buildFieldId('officeRfc')}-error`} />
+          <InlineFieldError
+            message={isTouched('officeRfc') ? errors.officeRfc : ''}
+            id={`${buildFieldId('officeRfc')}-error`}
+          />
         </div>
 
-        <div className={`field ${errors.zone ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('zone') && errors.zone ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('zone')}>
             Zona a la que perteneces
           </label>
@@ -406,6 +463,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               className="field-input"
               value={values.zone}
               onChange={handleInputChange('zone')}
+              onBlur={handleBlur('zone')}
               aria-invalid={Boolean(errors.zone)}
             >
               {zoneOptions.map((option) => (
@@ -416,7 +474,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             </select>
             <span className="select-arrow" aria-hidden="true" />
           </div>
-          <InlineFieldError message={errors.zone} id={`${buildFieldId('zone')}-error`} />
+          <InlineFieldError message={isTouched('zone') ? errors.zone : ''} id={`${buildFieldId('zone')}-error`} />
         </div>
       </div>
     );
@@ -425,7 +483,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
   if (stepKey === 'step3') {
     return (
       <div className="step-grid">
-        <div className={`field full-width ${errors.hasAllergies ? 'has-error' : ''}`}>
+        <div className={`field full-width ${isTouched('hasAllergies') && errors.hasAllergies ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('hasAllergies')}>
             ¿Tienes alguna alergia?
           </label>
@@ -435,6 +493,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               className="field-input"
               value={values.hasAllergies}
               onChange={handleYesNoChange('hasAllergies', 'allergiesDetails')}
+              onBlur={handleBlur('hasAllergies')}
               aria-invalid={Boolean(errors.hasAllergies)}
             >
               {yesNoOptions.map((option) => (
@@ -445,11 +504,14 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             </select>
             <span className="select-arrow" aria-hidden="true" />
           </div>
-          <InlineFieldError message={errors.hasAllergies} id={`${buildFieldId('hasAllergies')}-error`} />
+          <InlineFieldError
+            message={isTouched('hasAllergies') ? errors.hasAllergies : ''}
+            id={`${buildFieldId('hasAllergies')}-error`}
+          />
         </div>
 
         {values.hasAllergies === 'si' ? (
-          <div className={`field full-width ${errors.allergiesDetails ? 'has-error' : ''}`}>
+          <div className={`field full-width ${isTouched('allergiesDetails') && errors.allergiesDetails ? 'has-error' : ''}`}>
             <label className="field-label" htmlFor={buildFieldId('allergiesDetails')}>
               Favor de especificar
             </label>
@@ -459,17 +521,18 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               type="text"
               value={values.allergiesDetails}
               onChange={handleInputChange('allergiesDetails')}
+              onBlur={handleBlur('allergiesDetails')}
               aria-invalid={Boolean(errors.allergiesDetails)}
               aria-describedby={errors.allergiesDetails ? `${buildFieldId('allergiesDetails')}-error` : undefined}
             />
             <InlineFieldError
-              message={errors.allergiesDetails}
+              message={isTouched('allergiesDetails') ? errors.allergiesDetails : ''}
               id={`${buildFieldId('allergiesDetails')}-error`}
             />
           </div>
         ) : null}
 
-        <div className={`field full-width ${errors.hasMedicalCondition ? 'has-error' : ''}`}>
+        <div className={`field full-width ${isTouched('hasMedicalCondition') && errors.hasMedicalCondition ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('hasMedicalCondition')}>
             ¿Tienes algún padecimiento médico?
           </label>
@@ -479,6 +542,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               className="field-input"
               value={values.hasMedicalCondition}
               onChange={handleYesNoChange('hasMedicalCondition', 'medicalDetails')}
+              onBlur={handleBlur('hasMedicalCondition')}
               aria-invalid={Boolean(errors.hasMedicalCondition)}
             >
               {yesNoOptions.map((option) => (
@@ -490,13 +554,13 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             <span className="select-arrow" aria-hidden="true" />
           </div>
           <InlineFieldError
-            message={errors.hasMedicalCondition}
+            message={isTouched('hasMedicalCondition') ? errors.hasMedicalCondition : ''}
             id={`${buildFieldId('hasMedicalCondition')}-error`}
           />
         </div>
 
         {values.hasMedicalCondition === 'si' ? (
-          <div className={`field full-width ${errors.medicalDetails ? 'has-error' : ''}`}>
+          <div className={`field full-width ${isTouched('medicalDetails') && errors.medicalDetails ? 'has-error' : ''}`}>
             <label className="field-label" htmlFor={buildFieldId('medicalDetails')}>
               Favor de especificar
             </label>
@@ -506,14 +570,18 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               type="text"
               value={values.medicalDetails}
               onChange={handleInputChange('medicalDetails')}
+              onBlur={handleBlur('medicalDetails')}
               aria-invalid={Boolean(errors.medicalDetails)}
               aria-describedby={errors.medicalDetails ? `${buildFieldId('medicalDetails')}-error` : undefined}
             />
-            <InlineFieldError message={errors.medicalDetails} id={`${buildFieldId('medicalDetails')}-error`} />
+            <InlineFieldError
+              message={isTouched('medicalDetails') ? errors.medicalDetails : ''}
+              id={`${buildFieldId('medicalDetails')}-error`}
+            />
           </div>
         ) : null}
 
-        <div className={`field full-width ${errors.hasDiet ? 'has-error' : ''}`}>
+        <div className={`field full-width ${isTouched('hasDiet') && errors.hasDiet ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('hasDiet')}>
             ¿Tienes algún régimen alimenticio?
           </label>
@@ -523,6 +591,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               className="field-input"
               value={values.hasDiet}
               onChange={handleYesNoChange('hasDiet', 'dietDetails')}
+              onBlur={handleBlur('hasDiet')}
               aria-invalid={Boolean(errors.hasDiet)}
             >
               {yesNoOptions.map((option) => (
@@ -533,11 +602,11 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             </select>
             <span className="select-arrow" aria-hidden="true" />
           </div>
-          <InlineFieldError message={errors.hasDiet} id={`${buildFieldId('hasDiet')}-error`} />
+          <InlineFieldError message={isTouched('hasDiet') ? errors.hasDiet : ''} id={`${buildFieldId('hasDiet')}-error`} />
         </div>
 
         {values.hasDiet === 'si' ? (
-          <div className={`field full-width ${errors.dietDetails ? 'has-error' : ''}`}>
+          <div className={`field full-width ${isTouched('dietDetails') && errors.dietDetails ? 'has-error' : ''}`}>
             <label className="field-label" htmlFor={buildFieldId('dietDetails')}>
               Favor de especificar
             </label>
@@ -547,10 +616,14 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
               type="text"
               value={values.dietDetails}
               onChange={handleInputChange('dietDetails')}
+              onBlur={handleBlur('dietDetails')}
               aria-invalid={Boolean(errors.dietDetails)}
               aria-describedby={errors.dietDetails ? `${buildFieldId('dietDetails')}-error` : undefined}
             />
-            <InlineFieldError message={errors.dietDetails} id={`${buildFieldId('dietDetails')}-error`} />
+            <InlineFieldError
+              message={isTouched('dietDetails') ? errors.dietDetails : ''}
+              id={`${buildFieldId('dietDetails')}-error`}
+            />
           </div>
         ) : null}
       </div>
@@ -560,7 +633,7 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
   if (stepKey === 'step4') {
     return (
       <div className="step-grid">
-        <div className={`field full-width ${errors.emergencyContactName ? 'has-error' : ''}`}>
+        <div className={`field full-width ${isTouched('emergencyContactName') && errors.emergencyContactName ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('emergencyContactName')}>
             Contacto de emergencia (nombre completo)
           </label>
@@ -570,16 +643,17 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             type="text"
             value={values.emergencyContactName}
             onChange={handleInputChange('emergencyContactName')}
+            onBlur={handleBlur('emergencyContactName')}
             aria-invalid={Boolean(errors.emergencyContactName)}
             aria-describedby={errors.emergencyContactName ? `${buildFieldId('emergencyContactName')}-error` : undefined}
           />
           <InlineFieldError
-            message={errors.emergencyContactName}
+            message={isTouched('emergencyContactName') ? errors.emergencyContactName : ''}
             id={`${buildFieldId('emergencyContactName')}-error`}
           />
         </div>
 
-        <div className={`field ${errors.emergencyRelationship ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('emergencyRelationship') && errors.emergencyRelationship ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('emergencyRelationship')}>
             Parentesco
           </label>
@@ -589,16 +663,17 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             type="text"
             value={values.emergencyRelationship}
             onChange={handleInputChange('emergencyRelationship')}
+            onBlur={handleBlur('emergencyRelationship')}
             aria-invalid={Boolean(errors.emergencyRelationship)}
             aria-describedby={errors.emergencyRelationship ? `${buildFieldId('emergencyRelationship')}-error` : undefined}
           />
           <InlineFieldError
-            message={errors.emergencyRelationship}
+            message={isTouched('emergencyRelationship') ? errors.emergencyRelationship : ''}
             id={`${buildFieldId('emergencyRelationship')}-error`}
           />
         </div>
 
-        <div className={`field ${errors.emergencyPhone ? 'has-error' : ''}`}>
+        <div className={`field ${isTouched('emergencyPhone') && errors.emergencyPhone ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('emergencyPhone')}>
             Teléfono móvil (10 dígitos)
           </label>
@@ -610,11 +685,15 @@ function FormStepFields({ stepKey, values, errors, onFieldChange }) {
             pattern="\d*"
             value={values.emergencyPhone}
             onChange={handleNumericChange('emergencyPhone', 10)}
+            onBlur={handleBlur('emergencyPhone')}
             maxLength={10}
             aria-invalid={Boolean(errors.emergencyPhone)}
             aria-describedby={errors.emergencyPhone ? `${buildFieldId('emergencyPhone')}-error` : undefined}
           />
-          <InlineFieldError message={errors.emergencyPhone} id={`${buildFieldId('emergencyPhone')}-error`} />
+          <InlineFieldError
+            message={isTouched('emergencyPhone') ? errors.emergencyPhone : ''}
+            id={`${buildFieldId('emergencyPhone')}-error`}
+          />
         </div>
       </div>
     );

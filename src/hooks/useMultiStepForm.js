@@ -56,6 +56,12 @@ export function useMultiStepForm() {
     step3: {},
     step4: {},
   });
+  const [touchedByStep, setTouchedByStep] = useState({
+    step1: {},
+    step2: {},
+    step3: {},
+    step4: {},
+  });
 
   const totalSteps = 5;
   const isThankYouStep = currentStep === 5;
@@ -88,27 +94,29 @@ export function useMultiStepForm() {
     setErrorsByStep((prev) => {
       const prevStepErrors = prev[stepKey] || {};
       const nextStepData = { ...formData[stepKey], [field]: value };
+      const hasTouchedFields = Object.keys(touchedByStep[stepKey] || {}).length > 0;
+      const shouldValidate =
+        hasTouchedFields || liveValidateFields.has(field) || Object.keys(prevStepErrors).length > 0;
 
-      if (liveValidateFields.has(field)) {
-        const freshErrors = validateStepData(stepKey, nextStepData);
-        const nextStepErrors = { ...prevStepErrors };
-
-        if (freshErrors[field]) {
-          nextStepErrors[field] = freshErrors[field];
-        } else {
-          delete nextStepErrors[field];
-        }
-
-        return { ...prev, [stepKey]: nextStepErrors };
-      }
-
-      if (Object.keys(prevStepErrors).length === 0) {
+      if (!shouldValidate) {
         return prev;
       }
 
       const freshErrors = validateStepData(stepKey, nextStepData);
       return { ...prev, [stepKey]: freshErrors };
     });
+  };
+
+  const markTouched = (stepKey, field) => {
+    setTouchedByStep((prev) => ({
+      ...prev,
+      [stepKey]: { ...prev[stepKey], [field]: true },
+    }));
+
+    setErrorsByStep((prev) => ({
+      ...prev,
+      [stepKey]: validateStepData(stepKey, formData[stepKey]),
+    }));
   };
 
   const goNext = () => {
@@ -137,10 +145,12 @@ export function useMultiStepForm() {
     currentStepErrors,
     isCurrentStepValid,
     updateField,
+    markTouched,
     goNext,
     goPrev,
     validateCurrentStep,
     showThankYou,
     resetAll,
+    touchedByStep,
   };
 }

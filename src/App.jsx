@@ -84,11 +84,13 @@ function App() {
     currentStepErrors,
     isCurrentStepValid,
     updateField,
+    markTouched,
     goNext,
     goPrev,
     validateCurrentStep,
     showThankYou,
     resetAll,
+    touchedByStep,
   } = useMultiStepForm();
 
   const [attendanceState, setAttendanceState] = useState('pending');
@@ -234,10 +236,10 @@ function App() {
                     </div>
                     <div className="attendance-actions">
                       <button type="button" className="btn btn-primary" onClick={handleAttendanceYes}>
-                        Sí, nos vemos en Los Cabos 🌵☀️🏝️
+                        Sí, nos vemos en Los Cabos.
                       </button>
                       <button type="button" className="btn btn-secondary" onClick={handleAttendanceNo}>
-                        No
+                        No, lamento no poder acompañarlos.
                       </button>
                     </div>
                   </>
@@ -255,7 +257,9 @@ function App() {
                   stepKey={activeStepKey}
                   values={formData[activeStepKey]}
                   errors={currentStepErrors}
+                  touched={touchedByStep[activeStepKey]}
                   onFieldChange={updateField}
+                  onFieldBlur={markTouched}
                 />
               </div>
             )}

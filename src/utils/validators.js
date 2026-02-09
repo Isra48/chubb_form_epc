@@ -123,9 +123,7 @@ export function validateStepData(stepKey, stepData) {
       errors.flightCity = 'Ciudad de origen es obligatoria.';
     }
 
-    if (!stepData.phoneLandline.trim()) {
-      errors.phoneLandline = 'Teléfono fijo es obligatorio.';
-    } else if (!isValidPhone(stepData.phoneLandline)) {
+    if (stepData.phoneLandline.trim() && !isValidPhone(stepData.phoneLandline)) {
       errors.phoneLandline = 'El teléfono fijo debe contener 10 dígitos.';
     }
 
