@@ -47,6 +47,12 @@ function formatDateParts(day, month, year) {
   return `${dd}/${mm}/${year}`;
 }
 
+function formatPhoneDisplay(value) {
+  const digits = (value || '').replace(/\D/g, '');
+  if (digits.length !== 10) return value || '';
+  return `${digits.slice(0, 2)} ${digits.slice(2, 6)} ${digits.slice(6)}`;
+}
+
 function buildPayload(formData) {
   return {
     nombreGafete: formData.step1.badgeName?.trim(),
@@ -183,6 +189,7 @@ function App() {
     return {
       name,
       email: formData.step1.email?.trim(),
+      phone: formatPhoneDisplay(formData.step1.phoneMobile),
     };
   }, [formData]);
 
@@ -229,7 +236,9 @@ function App() {
           {!showAttendanceGate ? (
             <header className="form-header">
               <p className="form-eyebrow">Registro Chubb Surety Connect</p>
-              <h1 className="form-title">Por favor, completa el siguiente formulario.</h1>
+              <h1 className="form-title">
+                {isThankYouStep ? 'Gracias por completar tu registro.' : 'Por favor, completa el siguiente formulario.'}
+              </h1>
          
             </header>
           ) : null}
