@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import InlineFieldError from './InlineFieldError';
+
+const CAMERA_VARIANT = 'v3';
 
 const genderOptions = [
   { value: '', label: 'Selecciona una opción' },
@@ -36,9 +38,13 @@ const yesNoOptions = [
 function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, onFieldBlur }) {
   const buildFieldId = (field) => `${stepKey}-${field}`;
   const [photoError, setPhotoError] = useState('');
+  const [cameraError, setCameraError] = useState('');
+  const [showCamera, setShowCamera] = useState(false);
   const photoPreview = values.profilePhotoBase64 || '';
   const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024;
   const isTouched = (field) => Boolean(touched?.[field]);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
 
   const handleInputChange = (field) => (event) => {
     const value = event.target.value;
@@ -93,6 +99,69 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
     reader.readAsDataURL(file);
   };
 
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  };
+
+  const openCamera = async () => {
+    setCameraError('');
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraError('La cámara no está disponible en este dispositivo.');
+      return;
+    }
+
+    setShowCamera(true);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+    } catch (err) {
+      setCameraError('No se pudo acceder a la cámara.');
+      setShowCamera(false);
+    }
+  };
+
+  const closeCamera = () => {
+    setShowCamera(false);
+  };
+
+  const estimateBase64Bytes = (dataUrl) => {
+    const base64 = dataUrl.split(',')[1] || '';
+    return Math.ceil((base64.length * 3) / 4);
+  };
+
+  const handleCapture = () => {
+    if (!videoRef.current) return;
+    const video = videoRef.current;
+    const width = video.videoWidth || 640;
+    const height = video.videoHeight || 480;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.drawImage(video, 0, 0, width, height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+    if (estimateBase64Bytes(dataUrl) > MAX_IMAGE_BYTES) {
+      setPhotoError('La imagen es muy pesada');
+      return;
+    }
+
+    onFieldChange(stepKey, 'profilePhotoBase64', dataUrl);
+    onFieldChange(stepKey, 'profilePhotoName', `camara_${Date.now()}.jpg`);
+    setPhotoError('');
+    closeCamera();
+  };
+
   const handleYesNoChange = (field, detailField) => (event) => {
     const value = event.target.value;
     onFieldChange(stepKey, field, value);
@@ -101,6 +170,13 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
       onFieldChange(stepKey, detailField, '');
     }
   };
+
+  useEffect(() => {
+    if (!showCamera) {
+      stopCamera();
+    }
+    return () => stopCamera();
+  }, [showCamera]);
 
   if (stepKey === 'step1') {
     return (
@@ -119,8 +195,11 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
             </div>
             <div className="photo-actions">
               <label className="btn btn-secondary photo-button" htmlFor={buildFieldId('profilePhoto')}>
-                Subir o tomar foto
+                Subir foto
               </label>
+              <button type="button" className="btn btn-secondary photo-button" onClick={openCamera}>
+                Tomar foto
+              </button>
               <input
                 id={buildFieldId('profilePhoto')}
                 className="file-input"
@@ -131,9 +210,54 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
               <p className="photo-helper">
                 {values.profilePhotoName ? values.profilePhotoName : 'PNG o JPG. Máx. 1.5 MB.'}
               </p>
+              {cameraError ? <p className="photo-helper photo-helper-error">{cameraError}</p> : null}
             </div>
           </div>
           <InlineFieldError message={photoError} id={`${buildFieldId('profilePhoto')}-error`} />
+        </div>
+
+        {showCamera ? (
+          <div className="camera-modal" role="dialog" aria-modal="true">
+            <div className={`camera-card camera-card--${CAMERA_VARIANT}`}>
+              <div className="camera-header">
+                <div>
+                  <h3 className="camera-title">Tomar foto</h3>
+                  <p className="camera-subtitle">Vista previa en vivo</p>
+                </div>
+                <button type="button" className="btn btn-secondary camera-close" onClick={closeCamera}>
+                  Cerrar
+                </button>
+              </div>
+              <video ref={videoRef} className="camera-video" playsInline muted />
+              <p className="camera-note">Alinea tu rostro y toma la foto con buena luz.</p>
+              <div className="camera-actions">
+                <button type="button" className="btn btn-secondary" onClick={closeCamera}>
+                  Cancelar
+                </button>
+                <button type="button" className="btn btn-primary" onClick={handleCapture}>
+                  Usar foto
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        <div className={`field ${isTouched('badgeName') && errors.badgeName ? 'has-error' : ''}`}>
+          <label className="field-label" htmlFor={buildFieldId('badgeName')}>
+            Cómo te gustaría que aparezca tu nombre y apellido en el gafete?
+          </label>
+          <input
+            id={buildFieldId('badgeName')}
+            className="field-input"
+            type="text"
+            placeholder="Por favor, respeta el uso de mayúsculas, minúsculas y acentos. Considera un nombre y primer apellido"
+            value={values.badgeName}
+            onChange={handleInputChange('badgeName')}
+            onBlur={handleBlur('badgeName')}
+            aria-invalid={Boolean(errors.badgeName)}
+            aria-describedby={errors.badgeName ? `${buildFieldId('badgeName')}-error` : undefined}
+          />
+          <InlineFieldError message={isTouched('badgeName') ? errors.badgeName : ''} id={`${buildFieldId('badgeName')}-error`} />
         </div>
 
         <div className={`field ${isTouched('firstName') && errors.firstName ? 'has-error' : ''}`}>
@@ -144,6 +268,7 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
             id={buildFieldId('firstName')}
             className="field-input"
             type="text"
+            placeholder="Como aparece en tu INE."
             value={values.firstName}
             onChange={handleInputChange('firstName')}
             onBlur={handleBlur('firstName')}
@@ -213,6 +338,7 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
           <InlineFieldError message={isTouched('email') ? errors.email : ''} id={`${buildFieldId('email')}-error`} />
         </div>
 
+        {/*
         <div
           className={`field date-group ${
             (isTouched('birthDay') || isTouched('birthMonth') || isTouched('birthYear')) &&
@@ -296,6 +422,7 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
           </div>
           <InlineFieldError message={isTouched('gender') ? errors.gender : ''} id={`${buildFieldId('gender')}-error`} />
         </div>
+        */}
 
         <div className={`field ${isTouched('flightCity') && errors.flightCity ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('flightCity')}>
@@ -365,7 +492,7 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
 
         <div className={`field ${isTouched('shirtSize') && errors.shirtSize ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('shirtSize')}>
-            Talla de playera
+            Talla
           </label>
           <div className="select-wrapper">
             <select

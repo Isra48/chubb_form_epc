@@ -4,6 +4,7 @@ import { validateStepData } from '../utils/validators';
 const createStep1 = () => ({
   profilePhotoBase64: '',
   profilePhotoName: '',
+  badgeName: '',
   firstName: '',
   paternalLastName: '',
   maternalLastName: '',

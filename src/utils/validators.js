@@ -3,6 +3,7 @@ const PHONE_REGEX = /^\d{10}$/;
 
 export const fieldLabels = {
   profilePhotoBase64: 'Foto de perfil',
+  badgeName: 'Nombre para gafete',
   firstName: 'Nombre(s)',
   paternalLastName: 'Apellido Paterno',
   maternalLastName: 'Apellido Materno',
@@ -77,6 +78,12 @@ export function validateStepData(stepKey, stepData) {
   const errors = {};
 
   if (stepKey === 'step1') {
+    if (!stepData.badgeName.trim()) {
+      errors.badgeName = 'Nombre para gafete es obligatorio.';
+    } else if (!isValidName(stepData.badgeName)) {
+      errors.badgeName = 'Nombre para gafete contiene caracteres inválidos.';
+    }
+
     if (!stepData.firstName.trim()) {
       errors.firstName = 'Nombre(s) es obligatorio.';
     } else if (!isValidName(stepData.firstName)) {
@@ -101,23 +108,7 @@ export function validateStepData(stepKey, stepData) {
       errors.email = 'Ingresa un correo válido.';
     }
 
-    const dateError = validateDateParts({
-      day: stepData.birthDay,
-      month: stepData.birthMonth,
-      year: stepData.birthYear,
-    });
-
-    if (!stepData.birthDay.trim()) errors.birthDay = 'Día es obligatorio.';
-    if (!stepData.birthMonth.trim()) errors.birthMonth = 'Mes es obligatorio.';
-    if (!stepData.birthYear.trim()) errors.birthYear = 'Año es obligatorio.';
-
-    if (!errors.birthDay && !errors.birthMonth && !errors.birthYear && dateError) {
-      errors.birthDay = dateError;
-    }
-
-    if (!stepData.gender.trim()) {
-      errors.gender = 'Género es obligatorio.';
-    }
+    // Fecha de nacimiento y género están comentados en el formulario.
 
     if (!stepData.flightCity.trim()) {
       errors.flightCity = 'Ciudad de origen es obligatoria.';

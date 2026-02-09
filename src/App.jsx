@@ -28,35 +28,25 @@ const STEP_COPY = {
   },
 };
 
+const CHUBB_MX_URL = 'https://www.chubb.com/mx-es/';
+
 function formatYesNo(value) {
   if (value === 'si') return 'Sí';
   if (value === 'no') return 'No';
   return '';
 }
 
-function formatDate({ day, month, year }) {
-  if (!day || !month || !year) return '';
-  const dayValue = String(day).padStart(2, '0');
-  const monthValue = String(month).padStart(2, '0');
-  return `${dayValue}/${monthValue}/${year}`;
-}
-
 function buildPayload(formData) {
   return {
+    nombreGafete: formData.step1.badgeName?.trim(),
     nombre: formData.step1.firstName?.trim(),
     apellidoPaterno: formData.step1.paternalLastName?.trim(),
     apellidoMaterno: formData.step1.maternalLastName?.trim(),
     email: formData.step1.email?.trim(),
-    fechaNacimiento: formatDate({
-      day: formData.step1.birthDay,
-      month: formData.step1.birthMonth,
-      year: formData.step1.birthYear,
-    }),
-    genero: formData.step1.gender,
     ciudadOrigen: formData.step1.flightCity?.trim(),
     telefonoFijo: formData.step1.phoneLandline,
     telefonoMovil: formData.step1.phoneMobile,
-    tallaPlayera: formData.step1.shirtSize,
+    talla: formData.step1.shirtSize,
     claveAgente: formData.step2.agentKey?.trim(),
     nombreDespacho: formData.step2.officeName?.trim(),
     rfcDespacho: formData.step2.officeRfc?.trim(),
@@ -112,6 +102,16 @@ function App() {
     const timer = setTimeout(() => {
       setAttendanceLoading(false);
       setAttendanceReady(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [attendanceState]);
+
+  useEffect(() => {
+    if (attendanceState !== 'no') return undefined;
+
+    const timer = setTimeout(() => {
+      window.location.href = CHUBB_MX_URL;
     }, 2000);
 
     return () => clearTimeout(timer);
@@ -202,9 +202,9 @@ function App() {
         <div className="form-shell">
           {!showAttendanceGate ? (
             <header className="form-header">
-              <p className="form-eyebrow">Registro CHUBB</p>
+              <p className="form-eyebrow">Registro Chubb Surety Connect</p>
               <h1 className="form-title">Por favor, completa el siguiente formulario.</h1>
-              <p className="form-subtitle">Completa el registro en pocos pasos.</p>
+         
             </header>
           ) : null}
 
@@ -214,7 +214,9 @@ function App() {
             {showAttendanceGate ? (
               <div className="attendance-screen">
                 {attendanceState === 'no' ? (
-                  <p className="attendance-message">Gracias, ya puedes salir de esta página.</p>
+                  <p className="attendance-message">
+                    Esperamos coincidir contigo en la próxima edición de Surety Connect 
+                  </p>
                 ) : attendanceLoading ? (
                   <div className="attendance-loader">
                     <div className="loader-dots" aria-hidden="true">
