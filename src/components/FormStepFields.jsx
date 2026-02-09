@@ -19,10 +19,12 @@ const shirtSizeOptions = [
   { value: 'l', label: 'L' },
   { value: 'xl', label: 'XL' },
   { value: 'xxl', label: 'XXL' },
+  { value: 'xxxl', label: 'XXXL' },
 ];
 
 const zoneOptions = [
   { value: '', label: 'Selecciona una opción' },
+  { value: 'funcionarios-chubb', label: 'Funcionarios Chubb' },
   { value: 'zona-norte', label: 'Oficina Zona Norte' },
   { value: 'zona-sur', label: 'Oficina Zona Sur' },
   { value: 'zona-occidente', label: 'Oficina Zona Occidente' },
@@ -43,12 +45,22 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
   const photoPreview = values.profilePhotoBase64 || '';
   const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024;
   const isTouched = (field) => Boolean(touched?.[field]);
+  const isChubbStaff = values.zone === 'funcionarios-chubb';
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
   const handleInputChange = (field) => (event) => {
     const value = event.target.value;
     onFieldChange(stepKey, field, value);
+  };
+
+  const handleZoneChange = (event) => {
+    const value = event.target.value;
+    onFieldChange(stepKey, 'zone', value);
+    if (value === 'funcionarios-chubb') {
+      onFieldChange(stepKey, 'officeName', '');
+      onFieldChange(stepKey, 'officeRfc', '');
+    }
   };
 
   const handleBlur = (field) => () => {
@@ -523,6 +535,30 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
   if (stepKey === 'step2') {
     return (
       <div className="step-grid">
+        <div className={`field full-width ${isTouched('zone') && errors.zone ? 'has-error' : ''}`}>
+          <label className="field-label" htmlFor={buildFieldId('zone')}>
+            Zona a la que perteneces
+          </label>
+          <div className="select-wrapper">
+            <select
+              id={buildFieldId('zone')}
+              className="field-input"
+              value={values.zone}
+              onChange={handleZoneChange}
+              onBlur={handleBlur('zone')}
+              aria-invalid={Boolean(errors.zone)}
+            >
+              {zoneOptions.map((option) => (
+                <option key={option.value || 'empty'} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span className="select-arrow" aria-hidden="true" />
+          </div>
+          <InlineFieldError message={isTouched('zone') ? errors.zone : ''} id={`${buildFieldId('zone')}-error`} />
+        </div>
+
         <div className={`field full-width ${isTouched('agentKey') && errors.agentKey ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('agentKey')}>
             Clave de Agente/Broker
@@ -540,69 +576,49 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
           <InlineFieldError message={isTouched('agentKey') ? errors.agentKey : ''} id={`${buildFieldId('agentKey')}-error`} />
         </div>
 
-        <div className={`field full-width ${isTouched('officeName') && errors.officeName ? 'has-error' : ''}`}>
-          <label className="field-label" htmlFor={buildFieldId('officeName')}>
-            Nombre del despacho
-          </label>
-          <input
-            id={buildFieldId('officeName')}
-            className="field-input"
-            type="text"
-            value={values.officeName}
-            onChange={handleInputChange('officeName')}
-            onBlur={handleBlur('officeName')}
-            aria-invalid={Boolean(errors.officeName)}
-            aria-describedby={errors.officeName ? `${buildFieldId('officeName')}-error` : undefined}
-          />
-          <InlineFieldError
-            message={isTouched('officeName') ? errors.officeName : ''}
-            id={`${buildFieldId('officeName')}-error`}
-          />
-        </div>
-
-        <div className={`field ${isTouched('officeRfc') && errors.officeRfc ? 'has-error' : ''}`}>
-          <label className="field-label" htmlFor={buildFieldId('officeRfc')}>
-            RFC del despacho
-          </label>
-          <input
-            id={buildFieldId('officeRfc')}
-            className="field-input"
-            type="text"
-            value={values.officeRfc}
-            onChange={handleInputChange('officeRfc')}
-            onBlur={handleBlur('officeRfc')}
-            aria-invalid={Boolean(errors.officeRfc)}
-            aria-describedby={errors.officeRfc ? `${buildFieldId('officeRfc')}-error` : undefined}
-          />
-          <InlineFieldError
-            message={isTouched('officeRfc') ? errors.officeRfc : ''}
-            id={`${buildFieldId('officeRfc')}-error`}
-          />
-        </div>
-
-        <div className={`field ${isTouched('zone') && errors.zone ? 'has-error' : ''}`}>
-          <label className="field-label" htmlFor={buildFieldId('zone')}>
-            Zona a la que perteneces
-          </label>
-          <div className="select-wrapper">
-            <select
-              id={buildFieldId('zone')}
+        {!isChubbStaff ? (
+          <div className={`field full-width ${isTouched('officeName') && errors.officeName ? 'has-error' : ''}`}>
+            <label className="field-label" htmlFor={buildFieldId('officeName')}>
+              Nombre del despacho
+            </label>
+            <input
+              id={buildFieldId('officeName')}
               className="field-input"
-              value={values.zone}
-              onChange={handleInputChange('zone')}
-              onBlur={handleBlur('zone')}
-              aria-invalid={Boolean(errors.zone)}
-            >
-              {zoneOptions.map((option) => (
-                <option key={option.value || 'empty'} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <span className="select-arrow" aria-hidden="true" />
+              type="text"
+              value={values.officeName}
+              onChange={handleInputChange('officeName')}
+              onBlur={handleBlur('officeName')}
+              aria-invalid={Boolean(errors.officeName)}
+              aria-describedby={errors.officeName ? `${buildFieldId('officeName')}-error` : undefined}
+            />
+            <InlineFieldError
+              message={isTouched('officeName') ? errors.officeName : ''}
+              id={`${buildFieldId('officeName')}-error`}
+            />
           </div>
-          <InlineFieldError message={isTouched('zone') ? errors.zone : ''} id={`${buildFieldId('zone')}-error`} />
-        </div>
+        ) : null}
+
+        {!isChubbStaff ? (
+          <div className={`field ${isTouched('officeRfc') && errors.officeRfc ? 'has-error' : ''}`}>
+            <label className="field-label" htmlFor={buildFieldId('officeRfc')}>
+              RFC del despacho
+            </label>
+            <input
+              id={buildFieldId('officeRfc')}
+              className="field-input"
+              type="text"
+              value={values.officeRfc}
+              onChange={handleInputChange('officeRfc')}
+              onBlur={handleBlur('officeRfc')}
+              aria-invalid={Boolean(errors.officeRfc)}
+              aria-describedby={errors.officeRfc ? `${buildFieldId('officeRfc')}-error` : undefined}
+            />
+            <InlineFieldError
+              message={isTouched('officeRfc') ? errors.officeRfc : ''}
+              id={`${buildFieldId('officeRfc')}-error`}
+            />
+          </div>
+        ) : null}
       </div>
     );
   }

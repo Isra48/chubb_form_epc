@@ -134,16 +134,18 @@ export function validateStepData(stepKey, stepData) {
       errors.agentKey = 'Clave de Agente/Broker es obligatoria.';
     }
 
-    if (!stepData.officeName.trim()) {
-      errors.officeName = 'Nombre del despacho es obligatorio.';
-    }
-
-    if (!stepData.officeRfc.trim()) {
-      errors.officeRfc = 'RFC del despacho es obligatorio.';
-    }
-
     if (!stepData.zone.trim()) {
       errors.zone = 'Zona es obligatoria.';
+    }
+
+    if (stepData.zone !== 'funcionarios-chubb') {
+      if (!stepData.officeName.trim()) {
+        errors.officeName = 'Nombre del despacho es obligatorio.';
+      }
+
+      if (!stepData.officeRfc.trim()) {
+        errors.officeRfc = 'RFC del despacho es obligatorio.';
+      }
     }
   }
 
