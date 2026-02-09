@@ -262,7 +262,7 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
 
         <div className={`field ${isTouched('badgeName') && errors.badgeName ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('badgeName')}>
-            Cómo te gustaría que aparezca tu nombre y apellido en el gafete?
+            ¿Cómo te gustaría que aparezca tu nombre y apellido en el gafete?
           </label>
           <input
             id={buildFieldId('badgeName')}
