@@ -11,6 +11,12 @@ const genderOptions = [
   { value: 'prefiero-no-decir', label: 'Prefiero no decir' },
 ];
 
+const policyGenderOptions = [
+  { value: '', label: 'Selecciona una opción' },
+  { value: 'femenino', label: 'Femenino' },
+  { value: 'masculino', label: 'Masculino' },
+];
+
 const shirtSizeOptions = [
   { value: '', label: 'Selecciona una opción' },
   { value: 'xs', label: 'XS' },
@@ -724,6 +730,106 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
           </div>
         ) : null}
 
+        <div className={`field full-width ${isTouched('hasRelevantCondition') && errors.hasRelevantCondition ? 'has-error' : ''}`}>
+          <label className="field-label" htmlFor={buildFieldId('hasRelevantCondition')}>
+            ¿Tienes alguna condición médica relevante?
+          </label>
+          <div className="select-wrapper">
+            <select
+              id={buildFieldId('hasRelevantCondition')}
+              className="field-input"
+              value={values.hasRelevantCondition}
+              onChange={handleYesNoChange('hasRelevantCondition', 'relevantConditionDetails')}
+              onBlur={handleBlur('hasRelevantCondition')}
+              aria-invalid={Boolean(errors.hasRelevantCondition)}
+            >
+              {yesNoOptions.map((option) => (
+                <option key={option.value || 'empty'} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span className="select-arrow" aria-hidden="true" />
+          </div>
+          <InlineFieldError
+            message={isTouched('hasRelevantCondition') ? errors.hasRelevantCondition : ''}
+            id={`${buildFieldId('hasRelevantCondition')}-error`}
+          />
+        </div>
+
+        {values.hasRelevantCondition === 'si' ? (
+          <div
+            className={`field full-width ${isTouched('relevantConditionDetails') && errors.relevantConditionDetails ? 'has-error' : ''}`}
+          >
+            <label className="field-label" htmlFor={buildFieldId('relevantConditionDetails')}>
+              ¿Cuál?
+            </label>
+            <input
+              id={buildFieldId('relevantConditionDetails')}
+              className="field-input"
+              type="text"
+              value={values.relevantConditionDetails}
+              onChange={handleInputChange('relevantConditionDetails')}
+              onBlur={handleBlur('relevantConditionDetails')}
+              aria-invalid={Boolean(errors.relevantConditionDetails)}
+              aria-describedby={errors.relevantConditionDetails ? `${buildFieldId('relevantConditionDetails')}-error` : undefined}
+            />
+            <InlineFieldError
+              message={isTouched('relevantConditionDetails') ? errors.relevantConditionDetails : ''}
+              id={`${buildFieldId('relevantConditionDetails')}-error`}
+            />
+          </div>
+        ) : null}
+
+        <div className={`field full-width ${isTouched('takesMedication') && errors.takesMedication ? 'has-error' : ''}`}>
+          <label className="field-label" htmlFor={buildFieldId('takesMedication')}>
+            ¿Estás tomando algún medicamento?
+          </label>
+          <div className="select-wrapper">
+            <select
+              id={buildFieldId('takesMedication')}
+              className="field-input"
+              value={values.takesMedication}
+              onChange={handleYesNoChange('takesMedication', 'medicationDetails')}
+              onBlur={handleBlur('takesMedication')}
+              aria-invalid={Boolean(errors.takesMedication)}
+            >
+              {yesNoOptions.map((option) => (
+                <option key={option.value || 'empty'} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span className="select-arrow" aria-hidden="true" />
+          </div>
+          <InlineFieldError
+            message={isTouched('takesMedication') ? errors.takesMedication : ''}
+            id={`${buildFieldId('takesMedication')}-error`}
+          />
+        </div>
+
+        {values.takesMedication === 'si' ? (
+          <div className={`field full-width ${isTouched('medicationDetails') && errors.medicationDetails ? 'has-error' : ''}`}>
+            <label className="field-label" htmlFor={buildFieldId('medicationDetails')}>
+              ¿Cuál?
+            </label>
+            <input
+              id={buildFieldId('medicationDetails')}
+              className="field-input"
+              type="text"
+              value={values.medicationDetails}
+              onChange={handleInputChange('medicationDetails')}
+              onBlur={handleBlur('medicationDetails')}
+              aria-invalid={Boolean(errors.medicationDetails)}
+              aria-describedby={errors.medicationDetails ? `${buildFieldId('medicationDetails')}-error` : undefined}
+            />
+            <InlineFieldError
+              message={isTouched('medicationDetails') ? errors.medicationDetails : ''}
+              id={`${buildFieldId('medicationDetails')}-error`}
+            />
+          </div>
+        ) : null}
+
         <div className={`field full-width ${isTouched('hasDiet') && errors.hasDiet ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('hasDiet')}>
           ¿Tienes alguna restricción alimenticia que debamos tener en cuenta?
@@ -776,9 +882,199 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
   if (stepKey === 'step4') {
     return (
       <div className="step-grid">
+        <div className={`field full-width ${isTouched('policyFullName') && errors.policyFullName ? 'has-error' : ''}`}>
+          <label className="field-label" htmlFor={buildFieldId('policyFullName')}>
+            Nombre completo incluyendo apellidos (exactamente como aparece en el INE)
+          </label>
+          <input
+            id={buildFieldId('policyFullName')}
+            className="field-input"
+            type="text"
+            value={values.policyFullName}
+            onChange={handleInputChange('policyFullName')}
+            onBlur={handleBlur('policyFullName')}
+            aria-invalid={Boolean(errors.policyFullName)}
+            aria-describedby={errors.policyFullName ? `${buildFieldId('policyFullName')}-error` : undefined}
+          />
+          <InlineFieldError
+            message={isTouched('policyFullName') ? errors.policyFullName : ''}
+            id={`${buildFieldId('policyFullName')}-error`}
+          />
+        </div>
+
+        <div className={`field ${isTouched('policyGender') && errors.policyGender ? 'has-error' : ''}`}>
+          <label className="field-label" htmlFor={buildFieldId('policyGender')}>
+            Género
+          </label>
+          <div className="select-wrapper">
+            <select
+              id={buildFieldId('policyGender')}
+              className="field-input"
+              value={values.policyGender}
+              onChange={handleInputChange('policyGender')}
+              onBlur={handleBlur('policyGender')}
+              aria-invalid={Boolean(errors.policyGender)}
+            >
+              {policyGenderOptions.map((option) => (
+                <option key={option.value || 'empty'} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span className="select-arrow" aria-hidden="true" />
+          </div>
+          <InlineFieldError
+            message={isTouched('policyGender') ? errors.policyGender : ''}
+            id={`${buildFieldId('policyGender')}-error`}
+          />
+        </div>
+
+        <div
+          className={`field date-group ${
+            (isTouched('policyBirthDay') || isTouched('policyBirthMonth') || isTouched('policyBirthYear')) &&
+            (errors.policyBirthDay || errors.policyBirthMonth || errors.policyBirthYear)
+              ? 'has-error'
+              : ''
+          }`}
+        >
+          <label className="field-label" htmlFor={buildFieldId('policyBirthDay')}>
+            Fecha de nacimiento (día / mes / año)
+          </label>
+          <div className="date-inputs">
+            <input
+              id={buildFieldId('policyBirthDay')}
+              className="field-input date-input"
+              type="text"
+              inputMode="numeric"
+              placeholder="Día"
+              value={values.policyBirthDay}
+              onChange={handleNumericChange('policyBirthDay', 2)}
+              onBlur={handleBlur('policyBirthDay')}
+              maxLength={2}
+              aria-invalid={Boolean(errors.policyBirthDay)}
+            />
+            <input
+              id={buildFieldId('policyBirthMonth')}
+              className="field-input date-input"
+              type="text"
+              inputMode="numeric"
+              placeholder="Mes"
+              value={values.policyBirthMonth}
+              onChange={handleNumericChange('policyBirthMonth', 2)}
+              onBlur={handleBlur('policyBirthMonth')}
+              maxLength={2}
+              aria-invalid={Boolean(errors.policyBirthMonth)}
+            />
+            <input
+              id={buildFieldId('policyBirthYear')}
+              className="field-input date-input"
+              type="text"
+              inputMode="numeric"
+              placeholder="Año"
+              value={values.policyBirthYear}
+              onChange={handleNumericChange('policyBirthYear', 4)}
+              onBlur={handleBlur('policyBirthYear')}
+              maxLength={4}
+              aria-invalid={Boolean(errors.policyBirthYear)}
+            />
+          </div>
+          <p className="field-helper field-helper-compact">Formato: DD / MM / AAAA</p>
+          <InlineFieldError
+            message={
+              isTouched('policyBirthDay') || isTouched('policyBirthMonth') || isTouched('policyBirthYear')
+                ? errors.policyBirthDay || errors.policyBirthMonth || errors.policyBirthYear
+                : ''
+            }
+            id={`${buildFieldId('policyBirthDay')}-error`}
+          />
+        </div>
+
+        <div className={`field ${isTouched('policyIne') && errors.policyIne ? 'has-error' : ''}`}>
+          <label className="field-label" htmlFor={buildFieldId('policyIne')}>
+            No. de INE
+          </label>
+          <input
+            id={buildFieldId('policyIne')}
+            className="field-input"
+            type="text"
+            value={values.policyIne}
+            onChange={handleInputChange('policyIne')}
+            onBlur={handleBlur('policyIne')}
+            aria-invalid={Boolean(errors.policyIne)}
+            aria-describedby={errors.policyIne ? `${buildFieldId('policyIne')}-error` : undefined}
+          />
+          <InlineFieldError message={isTouched('policyIne') ? errors.policyIne : ''} id={`${buildFieldId('policyIne')}-error`} />
+        </div>
+
+        <div className={`field ${isTouched('policyCurp') && errors.policyCurp ? 'has-error' : ''}`}>
+          <label className="field-label" htmlFor={buildFieldId('policyCurp')}>
+            CURP
+          </label>
+          <input
+            id={buildFieldId('policyCurp')}
+            className="field-input"
+            type="text"
+            value={values.policyCurp}
+            onChange={handleInputChange('policyCurp')}
+            onBlur={handleBlur('policyCurp')}
+            aria-invalid={Boolean(errors.policyCurp)}
+            aria-describedby={errors.policyCurp ? `${buildFieldId('policyCurp')}-error` : undefined}
+          />
+          <InlineFieldError
+            message={isTouched('policyCurp') ? errors.policyCurp : ''}
+            id={`${buildFieldId('policyCurp')}-error`}
+          />
+        </div>
+
+        <div className={`field full-width ${isTouched('policyBeneficiaryName') && errors.policyBeneficiaryName ? 'has-error' : ''}`}>
+          <label className="field-label" htmlFor={buildFieldId('policyBeneficiaryName')}>
+            Nombre del beneficiario
+          </label>
+          <input
+            id={buildFieldId('policyBeneficiaryName')}
+            className="field-input"
+            type="text"
+            value={values.policyBeneficiaryName}
+            onChange={handleInputChange('policyBeneficiaryName')}
+            onBlur={handleBlur('policyBeneficiaryName')}
+            aria-invalid={Boolean(errors.policyBeneficiaryName)}
+            aria-describedby={errors.policyBeneficiaryName ? `${buildFieldId('policyBeneficiaryName')}-error` : undefined}
+          />
+          <InlineFieldError
+            message={isTouched('policyBeneficiaryName') ? errors.policyBeneficiaryName : ''}
+            id={`${buildFieldId('policyBeneficiaryName')}-error`}
+          />
+        </div>
+
+        <div className={`field ${isTouched('policyBeneficiaryRelationship') && errors.policyBeneficiaryRelationship ? 'has-error' : ''}`}>
+          <label className="field-label" htmlFor={buildFieldId('policyBeneficiaryRelationship')}>
+            Parentesco
+          </label>
+          <input
+            id={buildFieldId('policyBeneficiaryRelationship')}
+            className="field-input"
+            type="text"
+            value={values.policyBeneficiaryRelationship}
+            onChange={handleInputChange('policyBeneficiaryRelationship')}
+            onBlur={handleBlur('policyBeneficiaryRelationship')}
+            aria-invalid={Boolean(errors.policyBeneficiaryRelationship)}
+            aria-describedby={errors.policyBeneficiaryRelationship ? `${buildFieldId('policyBeneficiaryRelationship')}-error` : undefined}
+          />
+          <InlineFieldError
+            message={isTouched('policyBeneficiaryRelationship') ? errors.policyBeneficiaryRelationship : ''}
+            id={`${buildFieldId('policyBeneficiaryRelationship')}-error`}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (stepKey === 'step5') {
+    return (
+      <div className="step-grid">
         <div className={`field full-width ${isTouched('emergencyContactName') && errors.emergencyContactName ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('emergencyContactName')}>
-            Contacto de emergencia (nombre completo)
+            Nombre completo de contacto de emergencia
           </label>
           <input
             id={buildFieldId('emergencyContactName')}
@@ -818,14 +1114,14 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
 
         <div className={`field ${isTouched('emergencyPhone') && errors.emergencyPhone ? 'has-error' : ''}`}>
           <label className="field-label" htmlFor={buildFieldId('emergencyPhone')}>
-            Teléfono móvil (10 dígitos)
+            Teléfono móvil
           </label>
           <input
             id={buildFieldId('emergencyPhone')}
             className="field-input"
             type="text"
             inputMode="numeric"
-            pattern="\d*"
+            pattern="\\d*"
             value={values.emergencyPhone}
             onChange={handleNumericChange('emergencyPhone', 10)}
             onBlur={handleBlur('emergencyPhone')}

@@ -31,11 +31,27 @@ const createStep3 = () => ({
   allergiesDetails: '',
   hasMedicalCondition: '',
   medicalDetails: '',
+  hasRelevantCondition: '',
+  relevantConditionDetails: '',
+  takesMedication: '',
+  medicationDetails: '',
   hasDiet: '',
   dietDetails: '',
 });
 
 const createStep4 = () => ({
+  policyFullName: '',
+  policyGender: '',
+  policyBirthDay: '',
+  policyBirthMonth: '',
+  policyBirthYear: '',
+  policyIne: '',
+  policyCurp: '',
+  policyBeneficiaryName: '',
+  policyBeneficiaryRelationship: '',
+});
+
+const createStep5 = () => ({
   emergencyContactName: '',
   emergencyRelationship: '',
   emergencyPhone: '',
@@ -46,6 +62,7 @@ const initialFormData = {
   step2: createStep2(),
   step3: createStep3(),
   step4: createStep4(),
+  step5: createStep5(),
 };
 
 export function useMultiStepForm() {
@@ -56,17 +73,19 @@ export function useMultiStepForm() {
     step2: {},
     step3: {},
     step4: {},
+    step5: {},
   });
   const [touchedByStep, setTouchedByStep] = useState({
     step1: {},
     step2: {},
     step3: {},
     step4: {},
+    step5: {},
   });
 
-  const totalSteps = 5;
-  const isThankYouStep = currentStep === 5;
-  const activeStepKey = `step${Math.min(currentStep, 4)}`;
+  const totalSteps = 6;
+  const isThankYouStep = currentStep === totalSteps;
+  const activeStepKey = `step${Math.min(currentStep, 5)}`;
 
   const validateCurrentStep = () => {
     const validationErrors = validateStepData(activeStepKey, formData[activeStepKey]);
@@ -121,7 +140,7 @@ export function useMultiStepForm() {
   };
 
   const goNext = () => {
-    if (currentStep >= 4) return;
+    if (currentStep >= 5) return;
     const errors = validateCurrentStep();
     if (Object.keys(errors).length > 0) return;
     setCurrentStep((prev) => prev + 1);
@@ -129,11 +148,11 @@ export function useMultiStepForm() {
 
   const goPrev = () => setCurrentStep((prev) => Math.max(1, prev - 1));
 
-  const showThankYou = () => setCurrentStep(5);
+  const showThankYou = () => setCurrentStep(6);
 
   const resetAll = () => {
     setFormData(initialFormData);
-    setErrorsByStep({ step1: {}, step2: {}, step3: {}, step4: {} });
+    setErrorsByStep({ step1: {}, step2: {}, step3: {}, step4: {}, step5: {} });
     setCurrentStep(1);
   };
 

@@ -3,9 +3,9 @@ function ThankYouStepView({ summary, onReset }) {
     <div className="thank-you">
       <div>
         <p className="thank-you-eyebrow">Registro completado</p>
-        <h2>Gracias por tu tiempo.</h2>
+        <h2>Gracias por completar tu registro.</h2>
       </div>
-      <p>Tu registro fue enviado correctamente.</p>
+      <p>Tu información fue enviada correctamente.</p>
       <div className="thank-you-summary">
         <div>
           <span>Nombre</span>

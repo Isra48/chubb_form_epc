@@ -23,8 +23,12 @@ const STEP_COPY = {
     description: 'Comparte datos relevantes para tu atención.',
   },
   step4: {
-    title: 'Información de contacto de emergencia',
-    description: 'Necesitamos un contacto de respaldo.',
+    title: 'Datos póliza de seguro',
+    description: 'Información opcional para tu póliza.',
+  },
+  step5: {
+    title: 'Datos contacto de emergencia',
+    description: 'Información opcional del contacto de emergencia.',
   },
 };
 
@@ -34,6 +38,13 @@ function formatYesNo(value) {
   if (value === 'si') return 'Sí';
   if (value === 'no') return 'No';
   return '';
+}
+
+function formatDateParts(day, month, year) {
+  if (!day || !month || !year) return '';
+  const dd = String(day).padStart(2, '0');
+  const mm = String(month).padStart(2, '0');
+  return `${dd}/${mm}/${year}`;
 }
 
 function buildPayload(formData) {
@@ -55,11 +66,26 @@ function buildPayload(formData) {
     alergias: formData.step3.allergiesDetails?.trim(),
     tienePadecimiento: formatYesNo(formData.step3.hasMedicalCondition),
     padecimientos: formData.step3.medicalDetails?.trim(),
+    tieneCondicionRelevante: formatYesNo(formData.step3.hasRelevantCondition),
+    condicionRelevante: formData.step3.relevantConditionDetails?.trim(),
+    tomaMedicamento: formatYesNo(formData.step3.takesMedication),
+    medicamento: formData.step3.medicationDetails?.trim(),
     tieneRegimen: formatYesNo(formData.step3.hasDiet),
     regimen: formData.step3.dietDetails?.trim(),
-    contactoEmergenciaNombre: formData.step4.emergencyContactName?.trim(),
-    contactoEmergenciaParentesco: formData.step4.emergencyRelationship?.trim(),
-    contactoEmergenciaTelefono: formData.step4.emergencyPhone,
+    polizaNombreCompleto: formData.step4.policyFullName?.trim(),
+    polizaGenero: formData.step4.policyGender,
+    polizaFechaNacimiento: formatDateParts(
+      formData.step4.policyBirthDay,
+      formData.step4.policyBirthMonth,
+      formData.step4.policyBirthYear,
+    ),
+    polizaIne: formData.step4.policyIne?.trim(),
+    polizaCurp: formData.step4.policyCurp?.trim(),
+    polizaBeneficiarioNombre: formData.step4.policyBeneficiaryName?.trim(),
+    polizaBeneficiarioParentesco: formData.step4.policyBeneficiaryRelationship?.trim(),
+    contactoEmergenciaNombre: formData.step5.emergencyContactName?.trim(),
+    contactoEmergenciaParentesco: formData.step5.emergencyRelationship?.trim(),
+    contactoEmergenciaTelefono: formData.step5.emergencyPhone,
     imageBase64: formData.step1.profilePhotoBase64 || '',
   };
 }
