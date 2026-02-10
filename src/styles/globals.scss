@@ -60,6 +60,7 @@ body {
 .graphic-image-only {
   width: 100%;
   height: 100%;
+  background-image: url('../assets/col1.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -946,20 +947,18 @@ input[type='number'] {
 
   .graphic-panel {
     min-height: var(--graphic-mobile-height);
-    padding: 1.25rem;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.18)), url('../assets/bg.png');
-    background-size: 100% auto;
-    background-position: center top;
-    background-repeat: no-repeat;
+    padding: 0;
   }
 
   .graphic-image-only {
-    display: none;
+    display: block;
+    background-image: url('../assets/col1mb.png');
+    background-position: center;
+    background-size: contain;
   }
 
   .graphic-content.graphic-content--mobile {
-    display: grid;
-    width: 100%;
+    display: none;
   }
 
   .graphic-content {
