@@ -301,6 +301,12 @@ font-size: clamp(1.98rem, 2.93vw, 2.31rem);
   line-height: 1.6;
 }
 
+.attendance-disclaimer {
+  margin: -0.60rem 0 0;
+  font-size: 0.8rem;
+  color: rgba(107, 111, 118, 0.7);
+}
+
 .attendance-actions {
   display: grid;
   gap: 0.75rem;
@@ -309,6 +315,22 @@ font-size: clamp(1.98rem, 2.93vw, 2.31rem);
 
 .attendance-actions .btn {
   width: 100%;
+}
+
+.attendance-email {
+  display: grid;
+  gap: 0.75rem;
+  width: min(380px, 100%);
+}
+
+.attendance-next {
+  display: flex;
+  justify-content: center;
+  width: min(380px, 100%);
+}
+
+.attendance-next .btn {
+  width: min(240px, 100%);
 }
 
 .attendance-message {
@@ -975,6 +997,11 @@ input[type='number'] {
 
   .form-body {
     justify-content: flex-start;
+  }
+
+  .attendance-next {
+    margin: 0 auto;
+    justify-self: center;
   }
 }
 

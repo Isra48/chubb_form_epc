@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import FormStepFields from './components/FormStepFields';
 import FormStatusMessage from './components/FormStatusMessage';
+import InlineFieldError from './components/InlineFieldError';
 import StepPaginationControls from './components/StepPaginationControls';
 import StepperProgressBar from './components/StepperProgressBar';
 import ThankYouStepView from './components/ThankYouStepView';
@@ -8,6 +9,8 @@ import { useMultiStepForm } from './hooks/useMultiStepForm';
 import { useRegistration } from './hooks/useRegistration';
 import GraphicPanel from './layout/GraphicPanel';
 import SplitLayout from './layout/SplitLayout';
+import { isValidEmail } from './utils/validators';
+import { postRegistration } from './api/appsScript';
 
 const STEP_COPY = {
   step1: {
@@ -118,6 +121,9 @@ function App() {
   const [attendanceState, setAttendanceState] = useState('pending');
   const [attendanceReady, setAttendanceReady] = useState(false);
   const [attendanceLoading, setAttendanceLoading] = useState(false);
+  const [introEmail, setIntroEmail] = useState('');
+  const [introEmailTouched, setIntroEmailTouched] = useState(false);
+  const [introEmailReady, setIntroEmailReady] = useState(false);
   const [submissionCopyIndex, setSubmissionCopyIndex] = useState(0);
   const { isSubmitting, errorMessage, successMessage, submitRegistration, clearMessages } = useRegistration();
 
@@ -202,7 +208,8 @@ function App() {
         : null;
 
   const showFormSteps = attendanceReady;
-  const showAttendanceGate = !attendanceReady && !isThankYouStep;
+  const showIntroEmailGate = !introEmailReady && !isThankYouStep;
+  const showAttendanceGate = introEmailReady && !attendanceReady && !isThankYouStep;
 
   const submissionCopy = [
     'Validando información',
@@ -219,6 +226,23 @@ function App() {
   const handleAttendanceNo = () => {
     setAttendanceState('no');
     setAttendanceReady(false);
+    if (introEmail && isValidEmail(introEmail)) {
+      void postRegistration({ declinedEmail: introEmail, attendanceStatus: 'no' });
+    }
+  };
+
+  const introEmailError = introEmailTouched
+    ? !introEmail.trim()
+      ? 'El correo electrónico es obligatorio.'
+      : !isValidEmail(introEmail)
+        ? 'Ingresa un correo válido.'
+        : ''
+    : '';
+
+  const handleIntroEmailNext = () => {
+    setIntroEmailTouched(true);
+    if (!introEmail.trim() || !isValidEmail(introEmail)) return;
+    setIntroEmailReady(true);
   };
 
   const handleResetAll = () => {
@@ -226,6 +250,9 @@ function App() {
     setAttendanceState('pending');
     setAttendanceReady(false);
     setAttendanceLoading(false);
+    setIntroEmail('');
+    setIntroEmailTouched(false);
+    setIntroEmailReady(false);
   };
 
   return (
@@ -233,7 +260,7 @@ function App() {
       graphic={<GraphicPanel />}
       form={
         <div className="form-shell">
-          {!showAttendanceGate ? (
+          {!showAttendanceGate && !showIntroEmailGate ? (
             <header className="form-header">
               <p className="form-eyebrow">Registro Chubb Surety Connect </p>
               <h1 className="form-title">
@@ -246,7 +273,42 @@ function App() {
           {showFormSteps ? <StepperProgressBar currentStep={currentStep} totalSteps={totalSteps} /> : null}
 
           <div className="form-body" role="region" aria-live="polite">
-            {showAttendanceGate ? (
+            {showIntroEmailGate ? (
+              <div className="attendance-screen">
+                <div className="attendance-copy">
+                  <h1 className="attendance-title">Registro Chubb Surety Connect 2026</h1>
+                  <p className="attendance-location">📍 Los Cabos, México</p>
+                  <p className="attendance-lead">Ingresa tu correo para continuar con el registro.</p>
+                  <p className="attendance-disclaimer">(Solo un correo por persona.)</p>
+                </div>
+                <div className="attendance-email">
+                  <div className={`field full-width ${introEmailError ? 'has-error' : ''}`}>
+                    <label className="field-label" htmlFor="intro-email">
+                      Correo electrónico
+                    </label>
+                    <input
+                      id="intro-email"
+                      className="field-input"
+                      type="email"
+                      value={introEmail}
+                      onChange={(event) => {
+                        setIntroEmail(event.target.value);
+                        setIntroEmailTouched(true);
+                      }}
+                      onBlur={() => setIntroEmailTouched(true)}
+                      aria-invalid={Boolean(introEmailError)}
+                      aria-describedby={introEmailError ? 'intro-email-error' : undefined}
+                    />
+                    <InlineFieldError message={introEmailError} id="intro-email-error" />
+                  </div>
+                </div>
+                <div className="attendance-next">
+                  <button type="button" className="btn btn-primary" onClick={handleIntroEmailNext}>
+                    Siguiente
+                  </button>
+                </div>
+              </div>
+            ) : showAttendanceGate ? (
               <div className="attendance-screen">
                 {attendanceState === 'no' ? (
                   <p className="attendance-message">
@@ -267,7 +329,7 @@ function App() {
                       <h1 className="attendance-title">Registro Chubb Surety Connect 2026</h1>
                       <p className="attendance-location">📍 Los Cabos, México</p>
                       <p className="attendance-lead">
-                       Para continuar con tu registro en Chubb Surety Connect 2026, ingresa tu correo para confirmar tu asistencia.
+                       Para continuar con tu registro en Chubb Surety Connect 2026, confirma tu asistencia.
                       </p>
                     </div>
                     <div className="attendance-actions">
