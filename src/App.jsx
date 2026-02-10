@@ -124,6 +124,8 @@ function App() {
   const [introEmail, setIntroEmail] = useState('');
   const [introEmailTouched, setIntroEmailTouched] = useState(false);
   const [introEmailReady, setIntroEmailReady] = useState(false);
+  const [introPrivacyAccepted, setIntroPrivacyAccepted] = useState(false);
+  const [introPrivacyTouched, setIntroPrivacyTouched] = useState(false);
   const [submissionCopyIndex, setSubmissionCopyIndex] = useState(0);
   const { isSubmitting, errorMessage, successMessage, submitRegistration, clearMessages } = useRegistration();
 
@@ -239,9 +241,15 @@ function App() {
         : ''
     : '';
 
+  const introPrivacyError = introPrivacyTouched && !introPrivacyAccepted
+    ? 'Debes aceptar el aviso de privacidad.'
+    : '';
+
   const handleIntroEmailNext = () => {
     setIntroEmailTouched(true);
+    setIntroPrivacyTouched(true);
     if (!introEmail.trim() || !isValidEmail(introEmail)) return;
+    if (!introPrivacyAccepted) return;
     setIntroEmailReady(true);
   };
 
@@ -253,6 +261,8 @@ function App() {
     setIntroEmail('');
     setIntroEmailTouched(false);
     setIntroEmailReady(false);
+    setIntroPrivacyAccepted(false);
+    setIntroPrivacyTouched(false);
   };
 
   return (
@@ -262,7 +272,7 @@ function App() {
         <div className="form-shell">
           {!showAttendanceGate && !showIntroEmailGate ? (
             <header className="form-header">
-              <p className="form-eyebrow">Registro Chubb Surety Connect </p>
+              <p className="form-eyebrow">Registro Chubb Surety Connect 2026 </p>
               <h1 className="form-title">
                 {isThankYouStep ? 'Gracias por completar tu registro.' : 'Por favor, completa el siguiente formulario.'}
               </h1>
@@ -306,6 +316,32 @@ function App() {
                   <button type="button" className="btn btn-primary" onClick={handleIntroEmailNext}>
                     Siguiente
                   </button>
+                  <div className={`attendance-privacy ${introPrivacyError ? 'has-error' : ''}`}>
+                    <label className="attendance-privacy-label" htmlFor="intro-privacy">
+                      <input
+                        id="intro-privacy"
+                        type="checkbox"
+                        checked={introPrivacyAccepted}
+                        onChange={(event) => {
+                          setIntroPrivacyAccepted(event.target.checked);
+                          setIntroPrivacyTouched(true);
+                        }}
+                      />
+                      <span>
+                        He leído y acepto el{' '}
+                        <a
+                          className="privacy-link"
+                          href="https://www.chubb.com/content/dam/chubb-sites/chubb-com/mx-es/footer/privacy-notices/documents/pdf/aviso_de_privacidad_integral_eventos_dinamicas_chubb_group.pdf"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Aviso de privacidad
+                        </a>
+                        .
+                      </span>
+                    </label>
+                    <InlineFieldError message={introPrivacyError} id="intro-privacy-error" />
+                  </div>
                 </div>
               </div>
             ) : showAttendanceGate ? (
