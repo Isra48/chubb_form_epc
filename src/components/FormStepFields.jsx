@@ -264,11 +264,11 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
           <label className="field-label" htmlFor={buildFieldId('badgeName')}>
             ¿Cómo te gustaría que aparezca tu nombre y apellido en el gafete?
           </label>
+          <p className="field-helper">Por favor, respeta el uso de mayúsculas, minúsculas y acentos.</p>
           <input
             id={buildFieldId('badgeName')}
             className="field-input"
             type="text"
-            placeholder="Por favor, respeta el uso de mayúsculas, minúsculas y acentos. Considera un nombre y primer apellido"
             value={values.badgeName}
             onChange={handleInputChange('badgeName')}
             onBlur={handleBlur('badgeName')}
@@ -282,11 +282,11 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
           <label className="field-label" htmlFor={buildFieldId('firstName')}>
             Nombre(s)
           </label>
+          <p className="field-helper">Nombre completo incluyendo apellidos (exactamente como aparece en el INE).</p>
           <input
             id={buildFieldId('firstName')}
             className="field-input"
             type="text"
-            placeholder="Como aparece en tu INE."
             value={values.firstName}
             onChange={handleInputChange('firstName')}
             onBlur={handleBlur('firstName')}
