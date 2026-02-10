@@ -125,6 +125,7 @@ function App() {
   const [introEmailTouched, setIntroEmailTouched] = useState(false);
   const [introEmailReady, setIntroEmailReady] = useState(false);
   const [introPrivacyAccepted, setIntroPrivacyAccepted] = useState(false);
+  const [introPrivacyAgentsAccepted, setIntroPrivacyAgentsAccepted] = useState(false);
   const [introPrivacyTouched, setIntroPrivacyTouched] = useState(false);
   const [submissionCopyIndex, setSubmissionCopyIndex] = useState(0);
   const { isSubmitting, errorMessage, successMessage, submitRegistration, clearMessages } = useRegistration();
@@ -245,11 +246,15 @@ function App() {
     ? 'Debes aceptar el aviso de privacidad.'
     : '';
 
+  const introPrivacyAgentsError = introPrivacyTouched && !introPrivacyAgentsAccepted
+    ? 'Debes aceptar el aviso de privacidad para agentes.'
+    : '';
+
   const handleIntroEmailNext = () => {
     setIntroEmailTouched(true);
     setIntroPrivacyTouched(true);
     if (!introEmail.trim() || !isValidEmail(introEmail)) return;
-    if (!introPrivacyAccepted) return;
+    if (!introPrivacyAccepted || !introPrivacyAgentsAccepted) return;
     setIntroEmailReady(true);
   };
 
@@ -262,6 +267,7 @@ function App() {
     setIntroEmailTouched(false);
     setIntroEmailReady(false);
     setIntroPrivacyAccepted(false);
+    setIntroPrivacyAgentsAccepted(false);
     setIntroPrivacyTouched(false);
   };
 
@@ -335,12 +341,38 @@ function App() {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          Aviso de privacidad
+                          Aviso de privacidad integral para participantes en eventos y dinámicas
                         </a>
                         .
                       </span>
                     </label>
                     <InlineFieldError message={introPrivacyError} id="intro-privacy-error" />
+                  </div>
+                  <div className={`attendance-privacy ${introPrivacyAgentsError ? 'has-error' : ''}`}>
+                    <label className="attendance-privacy-label" htmlFor="intro-privacy-agents">
+                      <input
+                        id="intro-privacy-agents"
+                        type="checkbox"
+                        checked={introPrivacyAgentsAccepted}
+                        onChange={(event) => {
+                          setIntroPrivacyAgentsAccepted(event.target.checked);
+                          setIntroPrivacyTouched(true);
+                        }}
+                      />
+                      <span>
+                        He leído y acepto el{' '}
+                        <a
+                          className="privacy-link"
+                          href="https://www.chubb.com/content/dam/chubb-sites/chubb-com/mx-es/footer/privacy-notices/documents/pdf/avisodeprivacidad_agentes_chubbseguros.pdf"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Aviso de privacidad integral para agentes Chubb
+                        </a>
+                        .
+                      </span>
+                    </label>
+                    <InlineFieldError message={introPrivacyAgentsError} id="intro-privacy-agents-error" />
                   </div>
                 </div>
               </div>

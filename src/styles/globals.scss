@@ -335,6 +335,7 @@ font-size: clamp(1.98rem, 2.93vw, 2.31rem);
 
 .attendance-next .btn {
   width: min(240px, 100%);
+  margin-bottom: 4em;
 }
 
 .attendance-privacy {
@@ -342,6 +343,7 @@ font-size: clamp(1.98rem, 2.93vw, 2.31rem);
   margin: 0 auto;
   display: grid;
   gap: 0.35rem;
+  margin-top: 1em;
   font-size: 0.8rem;
   color: rgba(107, 111, 118, 0.75);
   text-align: left;
