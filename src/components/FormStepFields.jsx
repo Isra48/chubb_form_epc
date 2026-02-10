@@ -64,6 +64,7 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
     const value = event.target.value;
     onFieldChange(stepKey, 'zone', value);
     if (value === 'funcionarios-chubb') {
+      onFieldChange(stepKey, 'agentKey', '');
       onFieldChange(stepKey, 'officeName', '');
       onFieldChange(stepKey, 'officeRfc', '');
     }
@@ -565,22 +566,27 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
           <InlineFieldError message={isTouched('zone') ? errors.zone : ''} id={`${buildFieldId('zone')}-error`} />
         </div>
 
-        <div className={`field full-width ${isTouched('agentKey') && errors.agentKey ? 'has-error' : ''}`}>
-          <label className="field-label" htmlFor={buildFieldId('agentKey')}>
-            Clave de Agente/Broker
-          </label>
-          <input
-            id={buildFieldId('agentKey')}
-            className="field-input"
-            type="text"
-            value={values.agentKey}
-            onChange={handleInputChange('agentKey')}
-            onBlur={handleBlur('agentKey')}
-            aria-invalid={Boolean(errors.agentKey)}
-            aria-describedby={errors.agentKey ? `${buildFieldId('agentKey')}-error` : undefined}
-          />
-          <InlineFieldError message={isTouched('agentKey') ? errors.agentKey : ''} id={`${buildFieldId('agentKey')}-error`} />
-        </div>
+        {!isChubbStaff ? (
+          <div className={`field full-width ${isTouched('agentKey') && errors.agentKey ? 'has-error' : ''}`}>
+            <label className="field-label" htmlFor={buildFieldId('agentKey')}>
+              Clave de Agente/Broker
+            </label>
+            <input
+              id={buildFieldId('agentKey')}
+              className="field-input"
+              type="text"
+              value={values.agentKey}
+              onChange={handleInputChange('agentKey')}
+              onBlur={handleBlur('agentKey')}
+              aria-invalid={Boolean(errors.agentKey)}
+              aria-describedby={errors.agentKey ? `${buildFieldId('agentKey')}-error` : undefined}
+            />
+            <InlineFieldError
+              message={isTouched('agentKey') ? errors.agentKey : ''}
+              id={`${buildFieldId('agentKey')}-error`}
+            />
+          </div>
+        ) : null}
 
         {!isChubbStaff ? (
           <div className={`field full-width ${isTouched('officeName') && errors.officeName ? 'has-error' : ''}`}>
@@ -604,27 +610,6 @@ function FormStepFields({ stepKey, values, errors, touched = {}, onFieldChange, 
           </div>
         ) : null}
 
-        {!isChubbStaff ? (
-          <div className={`field ${isTouched('officeRfc') && errors.officeRfc ? 'has-error' : ''}`}>
-            <label className="field-label" htmlFor={buildFieldId('officeRfc')}>
-              RFC del despacho
-            </label>
-            <input
-              id={buildFieldId('officeRfc')}
-              className="field-input"
-              type="text"
-              value={values.officeRfc}
-              onChange={handleInputChange('officeRfc')}
-              onBlur={handleBlur('officeRfc')}
-              aria-invalid={Boolean(errors.officeRfc)}
-              aria-describedby={errors.officeRfc ? `${buildFieldId('officeRfc')}-error` : undefined}
-            />
-            <InlineFieldError
-              message={isTouched('officeRfc') ? errors.officeRfc : ''}
-              id={`${buildFieldId('officeRfc')}-error`}
-            />
-          </div>
-        ) : null}
       </div>
     );
   }

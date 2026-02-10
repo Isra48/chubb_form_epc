@@ -26,12 +26,12 @@ const STEP_COPY = {
     description: 'Comparte datos relevantes para tu atención.',
   },
   step4: {
-    title: 'Datos póliza de seguro',
-    description: 'Información opcional para tu póliza.',
+    title: 'Datos Póliza de seguro',
+    description: '',
   },
   step5: {
     title: 'Datos contacto de emergencia',
-    description: 'Información opcional del contacto de emergencia.',
+    description: 'Información  del contacto de emergencia.',
   },
 };
 

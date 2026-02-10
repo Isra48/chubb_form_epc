@@ -5,7 +5,7 @@ function ThankYouStepView({ summary, onReset }) {
         <p className="thank-you-eyebrow">Registro completado</p>
    
       </div>
-      <p className="thank-you-lead">Tu información fue enviada correctamente.</p>
+      <p className="thank-you-lead">Tu información fue enviada correctamente, en breve nos pondremos en contacto contigo para coordinar la logísticas de tu viaje y tu asistencia  al evento.</p>
       <div className="thank-you-summary">
         <p className="thank-you-summary-title">Resumen de tu registro:</p>
         <div className="thank-you-summary-item">
