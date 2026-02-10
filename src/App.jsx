@@ -235,7 +235,7 @@ function App() {
         <div className="form-shell">
           {!showAttendanceGate ? (
             <header className="form-header">
-              <p className="form-eyebrow">Registro Chubb Surety Connect</p>
+              <p className="form-eyebrow">Registro Chubb Surety Connect </p>
               <h1 className="form-title">
                 {isThankYouStep ? 'Gracias por completar tu registro.' : 'Por favor, completa el siguiente formulario.'}
               </h1>
@@ -264,11 +264,10 @@ function App() {
                 ) : (
                   <>
                     <div className="attendance-copy">
-                      <h1 className="attendance-title">Registro Chubb Surety Connect</h1>
+                      <h1 className="attendance-title">Registro Chubb Surety Connect 2026</h1>
                       <p className="attendance-location">📍 Los Cabos, México</p>
                       <p className="attendance-lead">
-                        Para continuar con el registro para nuestro Chubb Surety Connect 2026, te pedimos nos apoyes
-                        confirmando tu asistencia
+                       Para continuar con tu registro en Chubb Surety Connect 2026, ingresa tu correo para confirmar tu asistencia.
                       </p>
                     </div>
                     <div className="attendance-actions">
