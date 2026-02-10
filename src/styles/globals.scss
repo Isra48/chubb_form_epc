@@ -826,6 +826,17 @@ font-size: clamp(1.98rem, 2.93vw, 2.31rem);
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+  justify-content: center;
+}
+
+.thank-you-actions-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.thank-you-actions {
+  width: fit-content;
 }
 
 .thank-you-actions .btn {
@@ -841,11 +852,16 @@ font-size: clamp(1.98rem, 2.93vw, 2.31rem);
 
 .final-message p {
   margin: 0;
+
+   
 }
 
 .final-email {
   color: var(--accent);
   font-weight: 600;
+ 
+
+  
 }
 
 input[type='number']::-webkit-inner-spin-button,

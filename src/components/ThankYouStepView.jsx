@@ -52,19 +52,21 @@ function ThankYouStepView({ summary, onReset }) {
         </div>
       </div>
       <div className="final-message">
-        <p>
+        <p  style={{marginBottom: "1em", marginTop: "1em"}}>
           Cualquier duda, escríbenos a{' '}
           <span className="final-email">ChubbSuretyConnect2026@epconvenciones.com.mx</span>
         </p>
         <p>Staff Chubb México</p>
       </div>
-      <div className="thank-you-actions">
-        <button type="button" className="btn btn-secondary" onClick={onReset}>
-          Crear nuevo registro
-        </button>
-        <a className="btn btn-primary" href="https://www.chubb.com/mx-es/">
-          Finalizar
-        </a>
+      <div className="thank-you-actions-wrap">
+        <div className="thank-you-actions">
+          <button type="button" className="btn btn-secondary" onClick={onReset}>
+            Crear nuevo registro
+          </button>
+          <a className="btn btn-primary" href="https://www.chubb.com/mx-es/">
+            Finalizar
+          </a>
+        </div>
       </div>
     </div>
   );
